@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/NimSum/palette-pal-backend#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "knex": "^0.18.1",
     "pg": "^7.11.0"
