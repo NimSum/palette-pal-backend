@@ -1,6 +1,6 @@
 <!-- // lynne.rang@gmail.com -->
 
-<!-- git commit -m "Create initial migration for palettes and projects
+git commit -m "Add dummy data for seeding
 
 
-Co-authored-by: Lynne <lynne.rang@gmail.com" -->
+Co-authored-by: Lynne <lynne.rang@gmail.com"
