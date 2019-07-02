@@ -26,7 +26,7 @@ app.get('/api/v1/projects/:id', (req, res) => {
     .then(project => {
       if (!project.length) {
         res.status(404).json({ 
-          error: 'No project matches the requested id' 
+          error: 'Requested id does not correspond to any projects' 
         })
       }
       else {
@@ -50,6 +50,21 @@ app.get('/api/v1/palettes', (req, res) => {
   .catch(error => res.status(500).json({ error }))
 });
 
+app.get('/api/v1/palettes/:id', (req, res) => {
+  database('palettes')
+    .where({ id: req.params.id })
+    .then(palette => {
+      if (!palette.length) {
+        res.status(404).json({ 
+          error: 'Requested id does not correspond to any palettes' 
+        })
+      }
+      else {
+        res.status(200).json(...palette)
+      };
+    })
+    .catch(error => res.status(500).json({ error }));
+})
 
 
 
