@@ -144,3 +144,21 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
   })
   .catch(error => res.status(500).json({ error }))
 })
+
+app.put('/api/v1/projects/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  database('projects')
+  .where({ id })
+  .update({ name }, ['id'])
+  .then((id) => {
+    if (!id.length) {
+      res.status(404).json({ 
+        error: 'Failed to update: Project does not exist' 
+      });
+    } else res.status(202);
+  })
+  .catch(error => res.status(500).json({ error }))  
+})
+
