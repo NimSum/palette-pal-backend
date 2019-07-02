@@ -16,7 +16,10 @@ app.listen(app.get('port'), () => {
 app.get('/api/v1/projects', (req, res) => {
   database('projects')
   .select()
-  .then(projects => res.status(200).json(projects))
+    .then(projects => {
+      projects.length ? res.status(200).json(projects)
+        : res.status(404).json({error: 'No projects exist in projects table.'})
+    })
   .catch(error => res.status(500).json({ error }))
 });
 
@@ -39,14 +42,10 @@ app.get('/api/v1/projects/:id', (req, res) => {
 app.get('/api/v1/palettes', (req, res) => {
   database('palettes')
   .select()
-  .then(palettes => res.status(200).json(palettes))
-  .catch(error => res.status(500).json({ error }))
-});
-
-app.get('/api/v1/palettes', (req, res) => {
-  database('palettes')
-  .select()
-  .then(palettes => res.status(200).json(palettes))
+    .then(palettes => {
+      palettes.length ? res.status(200).json(palettes)
+        : res.status(404).json({ error: 'No palettes exist in palettes table.' })
+    })
   .catch(error => res.status(500).json({ error }))
 });
 
