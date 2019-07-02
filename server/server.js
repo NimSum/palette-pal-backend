@@ -27,3 +27,11 @@ app.get('/api/v1/palettes', (req, res) => {
   .catch(error => res.status(500).json({ error }))
 });
 
+app.get('/api/v1/palettes', (req, res) => {
+  database('palettes')
+  .select()
+  .then(palettes => res.status(200).json(palettes))
+  .catch(error => res.status(500).json({ error }))
+});
+
+
