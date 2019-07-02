@@ -66,5 +66,23 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .catch(error => res.status(500).json({ error }));
 })
 
+app.post('/api/v1/projects', (req, res) => {
+  let { name } = req.body;
+  if (!name) {
+    return res.status(422).send({
+      error: 'Required parameter "name" is missing'
+    });
+  }
 
-
+  database('projects')
+  .where({ name })
+  .then(project => {
+    if (!!project.length) {
+      res.status(409).json({ error: 'Project name already exists' })
+    } else {
+      database('projects').insert({ name }, 'id')
+      .then(projectId => res.status(201).json(projectId))
+      .catch(error => res.status(500).json({ error }))
+    }
+  }).catch(error => res.status(500).json({ error }))
+});
