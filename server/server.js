@@ -86,3 +86,29 @@ app.post('/api/v1/projects', (req, res) => {
     }
   }).catch(error => res.status(500).json({ error }))
 });
+
+app.post('/api/v1/palettes', (req, res) => {
+  let newPalette = req.body;
+  const parameters = [
+    'name', 
+    'project_id',
+    'color_1', 
+    'color_2', 
+    'color_3', 
+    'color_4', 
+    'color_5', 
+  ];
+
+  for (let requiredParam of parameters) {
+    if (!newPalette[requiredParam] ) {
+      res.status(422).json({ error: 
+        `Expected parameters of: ${parameters.join(', ')}. Missing: ${ requiredParam }`})
+      return;
+    }
+  }
+
+  database('palettes').insert(newPalette, 'id')
+  .then(paletteId => res.status(201).json(paletteId))
+  .catch(error => res.status(500).json({ error }))
+
+})
