@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "test:watch": "jest --watchAll"
   },
   "repository": {
     "type": "git",
