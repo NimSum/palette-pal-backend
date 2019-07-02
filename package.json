@@ -20,10 +20,19 @@
   },
   "homepage": "https://github.com/NimSum/palette-pal-backend#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "jest": "^24.8.0",
     "knex": "^0.18.1",
     "pg": "^7.11.0",
+    "psql": "0.0.1",
     "supertest": "^4.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "babel-jest": "^24.5.0",
+    "nodemon": "^1.19.1"
   }
 }

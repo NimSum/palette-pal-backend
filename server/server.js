@@ -179,3 +179,4 @@ app.put('/api/v1/palettes/:id', (req, res) => {
   .catch(error => res.status(500).json({ error }))  
 })
 
+module.exports = app;
