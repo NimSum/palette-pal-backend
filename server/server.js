@@ -112,3 +112,21 @@ app.post('/api/v1/palettes', (req, res) => {
   .catch(error => res.status(500).json({ error }))
 
 })
+
+app.delete('/api/v1/projects/:id', (req, res) => {
+  const { id } = req.params;
+
+  database('projects')
+    .where({ id })
+    .then(project => {
+      if (!project.length) {
+        res.status(404).json({ error: 'Failed to Delete: Project does not exist' }) 
+      } else {
+        database('projects')
+        .where({ id })
+        .del()
+        .then(() => res.status(202))
+        .catch(error => res.status(500).json({ error }))
+      };
+    }).catch(error => res.status(500).json({ error }));
+})
