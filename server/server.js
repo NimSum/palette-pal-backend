@@ -1,13 +1,15 @@
 const express = require('express');
 const app = express();
 const environment = process.env.NODE_ENV || 'development';
+const bodyParser = require('body-parser');
 const configuration = require('../knexfile')[environment];
 const database = require('knex')(configuration);
 const cors = require('cors');
 
-app.use(express.json());
+app.use(bodyParser.json());
+
 app.use(cors());
-app.set('port', process.env.PORT || 3001);
+app.set('port', process.env.PORT || 5555);
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
