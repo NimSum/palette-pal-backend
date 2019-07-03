@@ -1,6 +1,1 @@
-<!-- // lynne.rang@gmail.com -->
-
-git commit -m "Add seeding of dummy data and updates to dummy data structure
-
-
-Co-authored-by: Lynne <lynne.rang@gmail.com"
+[![Build Status](https://travis-ci.org/NimSum/palette-pal-backend.svg?branch=master)](https://travis-ci.org/NimSum/palette-pal-backend)
