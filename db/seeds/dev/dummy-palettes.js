@@ -23,7 +23,11 @@ const addProject = (knex, project) => {
 
 exports.seed = function(knex) {
   return knex('palettes').del()
-    .then(() => knex('projects').del())
+    .then(async () => {
+      await knex('projects').del();
+      await knex.raw('TRUNCATE TABLE palettes RESTART IDENTITY CASCADE');
+      await knex.raw('TRUNCATE TABLE projects RESTART IDENTITY CASCADE');
+    })
     .then(() => {
       const promises = [];
       dummyData.forEach(project => promises.push(addProject(knex, project)))

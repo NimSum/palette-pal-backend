@@ -3,7 +3,3 @@ node_js:
  - "node"
 services:
  - postgresql
-before_script:
- - psql -c 'CREATE DATABASE palettes;' -U postgres
- - knex migrate:latest
- - knex seed:run
