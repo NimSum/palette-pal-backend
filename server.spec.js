@@ -156,17 +156,28 @@ describe('Server', () => {
     
     it('should reject post if required param is invalid or not recieved', async () => {
       newPalette.project_id = null;
+
       const response = await request(app)
         .post('/api/v1/palettes')
         .send(newPalette);
-      const expected = { error: 'Expected parameters of: name, project_id, color_1, color_2, color_3, color_4, color_5. Missing: project_id'}
+
+      const expected = { error: 'Expected parameters of: name, project_id, color_1, color_2, color_3, color_4, color_5. Missing: project_id'};
+
       expect(response.status).toBe(422);
       expect(response.body).toEqual(expected);
     })
 
-    it('should reject post if palette name already exists', async () => {
-      
-    })
+    it('should reject post if project reference id does not match any projects in db', async () => {
+      newPalette.project_id = -1;
 
+      const response = await request(app)
+        .post('/api/v1/palettes')
+        .send(newPalette);
+      const error = response.body.error.detail;
+      const expected = 'Key (project_id)=(-1) is not present in table \"projects\".';
+
+      expect(response.status).toBe(500);
+      expect(error).toEqual(expected);
+    })
   })
 })
