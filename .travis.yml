@@ -7,5 +7,11 @@ before_script:
  - psql -c 'CREATE DATABASE palettes_test;' -U postgres
  - npm run migrate-test
  - npm run seed-test
- notifications:
+notifications:
   email: false
+deploy:
+  provider: heroku
+  api_key:
+    secure: bv2T2ss1lnH77KqFD9AIOT9SCFMzJy2wx1HrMlRn68jWx24NRimJNwIH/fcIcpoi3bl0TTUawU1Wh86dIg3jLtULQ1J8zqBL8MKqR1aX9iP+devNKltJxabvyzpOa1MswDfBAhdXw5Kep6XAvnNm/j5gLzuZLyTGExNfHxWo/KZvOsJfppWoj7GEJORdpN7WtQgFKOtXVe+ngkOYFOUnxnxLbl8H7uM7ADAmbU8M7xrTEr0hAybG9AV7QUgwlahpHqOm0Rf+Az1PMK4DGxK4fj4X0CtkQojv6c/T435rfMx6pZzoKwPaKcyF1eheKmCFWevPf1JXjteQwenMP73k8nxpmfJOf7vpY9REQgr8+gklBD59NkalBEB9bxa2Y+oDsxqo/V5ApBAU5GqSjPHVUC9hhskYagRoEUs5TIxvnPAh4dpqKQmhYUxARuJgVND+E7HNcDLMUoSSO22GrrHVWeUIwGfXIjtONwWX/fQqBk67ERRZCmmm0FwH54JjHhGaz0E6Qi01Z0IzGrfdpNKWzQzposWydU8dPe2uqnylQQLeqkgfwDP2wjpWfKTqKC1v99WZ00YvyJheBTxGSCBFlUEVtfKMiYeGRBjPfn/LF0TV8v6wyJNtagvooZi51sv7WW3nnrYTje7EletsjIXAHE87hO7UUeI56r8bS43xzU8=
+  app: palette-pal-be
+  skip_cleanup: true
