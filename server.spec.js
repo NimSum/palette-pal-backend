@@ -51,6 +51,28 @@ describe('Server', () => {
     })
   })
 
-  
+  describe('GET /api/v1/palettes', () => {
+    it('should return all palettes in the db palettes table if they exist', async () => {
+      const expectedPalettes = await db('palettes').then(palettes => convertDate(palettes));
+
+      const response = await request(app).get('/api/v1/palettes');
+      const result = response.body;
+
+      expect(result).toEqual(expectedPalettes);
+    })
+  })
+
+  describe('GET /api/v1/palettes/:id', () => {
+    it('should return a specific palette with the id in the endpoint', async () => {
+      const expectedPalette = await db('palettes').first();
+      const id = expectedPalette.id;
+
+      const response = await request(app).get(`/api/v1/palettes/${id}`);
+      const result = response.body;
+      console.log(result)
+
+      expect(result.name).toEqual(expectedPalette.name);
+    })
+  })
 
 })
