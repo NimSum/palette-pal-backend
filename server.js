@@ -105,7 +105,6 @@ app.post('/api/v1/palettes', (req, res) => {
   database('palettes').insert(newPalette, 'id')
   .then(paletteId => res.status(201).json(paletteId))
   .catch(error => res.status(500).json({ error }))
-
 })
 
 app.delete('/api/v1/projects/:id', (req, res) => {
