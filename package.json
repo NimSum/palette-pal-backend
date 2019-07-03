@@ -2,7 +2,7 @@
   "name": "palette-pal-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "knexfile.js",
   "scripts": {
     "start": "node server.js",
     "test": "jest --forceExit",
