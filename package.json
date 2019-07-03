@@ -28,7 +28,6 @@
     "jest": "^24.8.0",
     "knex": "^0.18.1",
     "pg": "^7.11.0",
-    "psql": "0.0.1",
     "supertest": "^4.0.2"
   },
   "devDependencies": {
