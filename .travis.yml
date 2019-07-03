@@ -1,17 +1,17 @@
 language: node_js
 node_js:
- - "node"
+- node
 services:
- - postgresql
+- postgresql
 before_script:
- - psql -c 'CREATE DATABASE palettes_test;' -U postgres
- - npm run migrate-test
- - npm run seed-test
+- psql -c 'CREATE DATABASE palettes_test;' -U postgres
+- npm run migrate-test
+- npm run seed-test
 notifications:
   email: false
 deploy:
   provider: heroku
   api_key:
-    secure: rT39Dq0l6bSQbzokLZc6HMasjZY5YMRvlSzwN5mGcK3HrELfAa9+dZs8tkcI3F+UMOf7xSdjJQEIMcoAKNtRd4kL099/TgVovPFJPN7hQbE4MxKExxZb6fXo1hn8Ar+wVgbPGxziPfvzXIEOvHGRWlJEPwR/FE7GvtMu1jRjGkgs2OfnVVGp9PiZfqjIWMrzHuS36pSkIB4UHilhDIAsyuDbtlJJ1/ZctchI/3ave+DH2M2NBUMD21o4g0ok0KE93dgxr9iPxnxI0uUdCQAsS4mzWknMZtlvFEuLuJSFl8QbYjjngdWQNxLNxiFg80KGsPM/o8jXMpxRBsZXFpKDfIFT3P4qMZdOkRCzQKF5KjntKcib5gMOu3d6vhCnk+IQLp5nczviytUjFno121KFCU4k03uUOmEy1hB0il9izz/eHgLO3tCuDUxBgVLhJaU3a9JNHYPjzJof1AlKb0t5hkIuDZGSL0O0QuD5nng0vOGi2CCZRfoGYwhFdLGbeyxSiTgLH7ZDeMszH3tv/b5y0YNrhu2QMHSHm2XUPiSxMlY3hMG7Lx+QeZSEydg/Mnqr8EJexgh5bfQKL8aFWPgX3gEDIlfb4zC/8osBXi0tqLIqeFxEC3/CsGg9CHFPdNsWpqHlsgQGR/9PBik9CqKnt17bOS/fk/Nn7u8Kp9rB/6c=
+    secure: myzC+yteKhhsuVtvwS9k2tNh5bjZRjuPlDLwSKZnWZshIuGnvS7YBnHUkXptLX+Xnc09VGSdNRqiN6poWL9oVi/ePNPIUWfnBSVfcTcPzpkHj9ZFE5GOaoWBauV/Ac8K0H6ur9SNGopNOMSaheosql4aCUhzTsujdOJCCIdauOkElnJEEZI4aJ6C87wtQQlyzOiRZFzNrducvMq6SmkPr6qPWVdfSd5vIZbjVwh0VE4qvkSi27+KZ/+bD6NFVmo6kcgH2PD5GaOci0LGDDEydQVUnRlfB9VWgn28Iyp3dJr6d/Lo4HzcqdNpRfiJcwuVcspv8W9CdspkV9LRmSm6ubEbRSz9MZIYB0DNDLSzG6V5W/6+49UGQIkT8J4gWUqA0bbk9B/QpPADzoiKbQ3NxP3cTjp7WjmQR+8PNy3oMYhDQ2yVTiN3Bhgmtzp8Pc13VvMdqyfwRg3X6au24fvdH6Gycvd0r5p8GyzOgOB72hPg+B3pSC9j2kXyiX+OPdVY4gtz4PHV3fmS+g1c7UVXDn7CiCGZfqzxGgsKsiEw6ioBChus1wuW+2JNj2sR+/i/S1+xThrkESmGEET9KKLeau00JMaOP0jCYvOAYRS2tPfHwgzbKuTmA2B4LEzm8TmpP0u5Scv7bDdQ/684hEbnjvfBCLM0I7/AwWt/lIdpj4E=
   app: palette-pal-be
   skip_cleanup: true
