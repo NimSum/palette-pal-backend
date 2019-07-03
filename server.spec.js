@@ -118,34 +118,50 @@ describe('Server', () => {
     })
 
     it('should reject post if project name already exists', async () => {
-      
+      const firstProject = await db('projects').first();
+      const { name } = firstProject;
+      const response = await request(app)
+        .post('/api/v1/projects')
+        .send({ name });
+
+      const expectedError = { error: 'Project name already exists' };
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual(expectedError);
     })
 
   })
 
   describe('POST /api/v1/palettes/', () => {
+    const newPalette = { 
+      name: "Nimsum's Warm Palette",
+      color_1: "#000000",
+      color_2: "#000000",
+      color_3: "#000000",
+      color_4: "#000000",
+      color_5: "#000000",
+      project_id: 1
+    };
+    
     it('should post a new palette in palettes db', async () => {
-      const newPalette = { 
-        name: "Nimsum's Warm Palette",
-        color_1: "#000000",
-        color_2: "#000000",
-        color_3: "#000000",
-        color_4: "#000000",
-        color_5: "#000000",
-        project_id: 1
-      };
-
+      
       const response = await request(app)
         .post('/api/v1/palettes')
         .send(newPalette);
-
       const id = parseInt(response.body)
       
-      const palette = await db('palettes').where({ id }).first();
-      expect(palette.name).toEqual(newPalette.name);
+      const project = await db('palettes').where({ id }).first();
+
+      expect(project.name).toEqual(newPalette.name);
     })
     
     it('should reject post if required param is invalid or not recieved', async () => {
+      newPalette.project_id = null;
+      const response = await request(app)
+        .post('/api/v1/palettes')
+        .send(newPalette);
+      const expected = { error: 'Expected parameters of: name, project_id, color_1, color_2, color_3, color_4, color_5. Missing: project_id'}
+      expect(response.status).toBe(422);
+      expect(response.body).toEqual(expected);
     })
 
     it('should reject post if palette name already exists', async () => {
