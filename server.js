@@ -15,11 +15,19 @@ app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
 });
 
-app.get('/api/v1/projects', (req, res) => {
-  database('projects')
-  .select()
+app.get('/api/v1/projects/:with_palettes?', (req, res) => {
+  const { with_palettes } = req.params;
+
+  if (!!with_palettes) {
+    database('palettes')
+    .join('projects', 'projects.id', '=', 'palettes.project_id')
     .then(projects => res.status(200).json(projects))
-  .catch(error => res.status(500).json({ error }))
+  } else {
+    database('projects')
+    .select()
+    .then(projects => res.status(200).json(projects))
+    .catch(error => res.status(500).json({ error }))
+  }
 });
 
 app.get('/api/v1/projects/:id', (req, res) => {
@@ -69,9 +77,17 @@ app.post('/api/v1/projects', (req, res) => {
     });
   }
 
-  database('projects').insert({ name }, 'id')
-    .then(projectId => res.status(201).json(projectId))
-    .catch(error => res.status(500).json({ error }))
+  database('projects')
+  .where({ name })
+  .then(project => {
+    if (!!project.length) {
+      res.status(409).json({ error: 'Project name already exists' })
+    } else {
+      database('projects').insert({ name }, 'id')
+      .then(projectId => res.status(201).json(projectId))
+      .catch(error => res.status(500).json({ error }))
+    }
+  }).catch(error => res.status(500).json({ error }))
 });
 
 app.post('/api/v1/palettes', (req, res) => {
