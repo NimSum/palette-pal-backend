@@ -233,10 +233,11 @@ describe('Server', () => {
   })
 
   describe('PUT /api/v1/projects/:id', () => {
+    const newName = { name: "NIMDIMSUM" }
+
     it('should update the project name on valid requests', async () => {
       const project = await db('projects').first();
       const projectToUpdate = project.id;
-      const newName = { name: "NIMDIMSUM" }
       
       const response = await request(app)
         .put(`/api/v1/projects/${projectToUpdate}`)
@@ -250,14 +251,50 @@ describe('Server', () => {
     })
     
     it('should respond with an error for invalid project id', async () => {
-      const newName = { name: "NIMDIMSUM" }
       const error = { 
         error: 'Failed to update: Project does not exist' 
       }
-      
+
       const response = await request(app)
         .put('/api/v1/projects/-1')
         .send(newName);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(error);
+    })
+  })
+
+  describe('PUT /api/v1/palettes/:id', () => {
+    const updatedPalette = { 
+      color_1: "#000000",
+      color_4: "#001100",
+      name: "NEW UPDATED"
+    }
+
+    it('should update the palette props on valid requests', async () => {
+      const palette = await db('palettes').first();
+      const paletteToUpdate = palette.id;
+      
+      const response = await request(app)
+        .put(`/api/v1/palettes/${paletteToUpdate}`)
+        .send(updatedPalette)
+        
+      const updated = await db('palettes').where( { id: paletteToUpdate }).first();
+      
+      expect(response.status).toBe(202);
+      expect(updated.color_1).toEqual(updatedPalette.color_1);
+      expect(updated.color_4).toEqual(updatedPalette.color_4);
+      expect(updated.name).toEqual(updatedPalette.name);
+    })
+    
+    it('should respond with an error for invalid palette id', async () => {
+      const error = { 
+        error: 'Failed to update: Palette does not exist' 
+      }
+
+      const response = await request(app)
+        .put('/api/v1/palettes/-1')
+        .send(updatedPalette);
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual(error);
