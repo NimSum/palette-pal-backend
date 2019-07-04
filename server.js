@@ -9,19 +9,20 @@ const cors = require('cors');
 app.use(bodyParser.json());
 
 app.use(cors());
-app.set('port', process.env.PORT || 30001);
+app.set('port', process.env.PORT || 3001);
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
 });
 
-app.get('/api/v1/projects/:with_palettes?', (req, res) => {
-  const { with_palettes } = req.params;
-
-  if (!!with_palettes) {
+app.get('/api/v1/projects', (req, res) => {
+  const { palettes } = req.query;
+  
+  if (palettes === 'included') {
     database('palettes')
     .join('projects', 'projects.id', '=', 'palettes.project_id')
     .then(projects => res.status(200).json(projects))
+    .catch(error => res.status(500).json({ error }))
   } else {
     database('projects')
     .select()
