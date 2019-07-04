@@ -191,7 +191,7 @@ describe('Server', () => {
       const deleted = await db('projects').where( { id: projectToDelete });
 
       expect(response.status).toBe(202);
-      expect(deleted).toEqual(response.body);
+      expect(deleted).toEqual([]);
     })
 
     it('should respond with an error if id param is not in the projects db', async () => {
@@ -207,7 +207,7 @@ describe('Server', () => {
   })
 
   describe('DELETE /api/v1/palettes/:id', () => {
-    it.skip('should delete palettes using the id param', async () => {
+    it('should delete palettes using the id param', async () => {
       const palette = await db('palettes').first();
       const paletteToDelete = palette.id;
 
@@ -216,7 +216,7 @@ describe('Server', () => {
       const deleted = await db('palettes').where( { id: paletteToDelete });
       
       expect(response.status).toBe(202);
-      expect(deleted).toEqual(response.body);
+      expect(deleted).toEqual([]);
     })
 
     it('should respond with an error if id param is not in the palettes db', async () => {
