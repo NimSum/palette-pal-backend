@@ -117,19 +117,6 @@ describe('Server', () => {
       expect(responseNoParam.status).toBe(422);
       expect(responseNoParam.body).toEqual(expectedError);
     })
-
-    it('should reject post if project name already exists', async () => {
-      const firstProject = await db('projects').first();
-      const { name } = firstProject;
-      const response = await request(app)
-        .post('/api/v1/projects')
-        .send({ name });
-
-      const expectedError = { error: 'Project name already exists' };
-      expect(response.status).toBe(409);
-      expect(response.body).toEqual(expectedError);
-    })
-
   })
 
   describe('POST /api/v1/palettes/', () => {
