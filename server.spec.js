@@ -97,6 +97,7 @@ describe('Server', () => {
       
       const project = await db('projects').where({ id }).first();
 
+      expect(response.status).toBe(201);
       expect(project.name).toEqual(newProject.name);
     })
 
@@ -149,9 +150,10 @@ describe('Server', () => {
         .send(newPalette);
       const id = parseInt(response.body)
       
-      const project = await db('palettes').where({ id }).first();
+      const palette = await db('palettes').where({ id }).first();
 
-      expect(project.name).toEqual(newPalette.name);
+      expect(response.status).toBe(201);
+      expect(palette.name).toEqual(newPalette.name);
     })
     
     it('should reject post if required param is invalid or not recieved', async () => {
@@ -179,7 +181,125 @@ describe('Server', () => {
       expect(response.status).toBe(500);
       expect(error).toEqual(expected);
     })
+  })
 
+  describe('DELETE /api/v1/projects/:id', () => {
+    it.skip('should delete projects using the id param', async () => {
+      const project = await db('projects').first();
+      const projectToDelete = project.id;
+
+      const response = await request(app)
+        .delete(`/api/v1/projects/${projectToDelete}`);
+      const deleted = await db('projects').where( { id: projectToDelete });
+
+      expect(response.status).toBe(202);
+      expect(deleted).toEqual([]);
+    })
+
+    it('should respond with an error if id param is not in the projects db', async () => {
+
+      const response = await request(app)
+        .delete('/api/v1/projects/-1');
+      const expectedError = { 
+        error: 'Failed to Delete: Project does not exist' 
+      };
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(expectedError);
+    })
+  })
+
+  describe('DELETE /api/v1/palettes/:id', () => {
+    it('should delete palettes using the id param', async () => {
+      const palette = await db('palettes').first();
+      const paletteToDelete = palette.id;
+
+      const response = await request(app)
+        .delete(`/api/v1/palettes/${paletteToDelete}`);
+      const deleted = await db('palettes').where( { id: paletteToDelete });
+      
+      expect(response.status).toBe(202);
+      expect(deleted).toEqual([]);
+    })
+
+    it('should respond with an error if id param is not in the palettes db', async () => {
+      const response = await request(app)
+        .delete('/api/v1/palettes/-1');
+
+      const expectedError = { 
+        error: 'Failed to Delete: Palette does not exist' 
+      };
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(expectedError);
+    })
+  })
+
+  describe('PUT /api/v1/projects/:id', () => {
+    const newName = { name: "NIMDIMSUM" }
+
+    it('should update the project name on valid requests', async () => {
+      const project = await db('projects').first();
+      const projectToUpdate = project.id;
+      
+      const response = await request(app)
+        .put(`/api/v1/projects/${projectToUpdate}`)
+        .send(newName)
+        
+      const updated = await db('projects').where( { id: projectToUpdate }).first();
+      
+      expect(response.status).toBe(202);
+      expect(updated.name).toEqual(newName.name);
+
+    })
     
+    it('should respond with an error for invalid project id', async () => {
+      const error = { 
+        error: 'Failed to update: Project does not exist' 
+      }
+
+      const response = await request(app)
+        .put('/api/v1/projects/-1')
+        .send(newName);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(error);
+    })
+  })
+
+  describe('PUT /api/v1/palettes/:id', () => {
+    const updatedPalette = { 
+      color_1: "#000000",
+      color_4: "#001100",
+      name: "NEW UPDATED"
+    }
+
+    it('should update the palette props on valid requests', async () => {
+      const palette = await db('palettes').first();
+      const paletteToUpdate = palette.id;
+      
+      const response = await request(app)
+        .put(`/api/v1/palettes/${paletteToUpdate}`)
+        .send(updatedPalette)
+        
+      const updated = await db('palettes').where( { id: paletteToUpdate }).first();
+      
+      expect(response.status).toBe(202);
+      expect(updated.color_1).toEqual(updatedPalette.color_1);
+      expect(updated.color_4).toEqual(updatedPalette.color_4);
+      expect(updated.name).toEqual(updatedPalette.name);
+    })
+    
+    it('should respond with an error for invalid palette id', async () => {
+      const error = { 
+        error: 'Failed to update: Palette does not exist' 
+      }
+
+      const response = await request(app)
+        .put('/api/v1/palettes/-1')
+        .send(updatedPalette);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(error);
+    })
   })
 })
