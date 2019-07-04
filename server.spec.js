@@ -184,11 +184,11 @@ describe('Server', () => {
   describe('DELETE /api/v1/projects/:id', () => {
     it.skip('should delete projects using the id param', async () => {
       const project = await db('projects').first();
-      const idToDelete = project.id;
+      const projectToDelete = project.id;
 
       const response = await request(app)
-        .delete(`/api/v1/projects/${idToDelete}`);
-      const deleted = await db('projects').where( { id: idToDelete });
+        .delete(`/api/v1/projects/${projectToDelete}`);
+      const deleted = await db('projects').where( { id: projectToDelete });
       expect(deleted).toEqual(response.body);
     })
 
@@ -199,6 +199,30 @@ describe('Server', () => {
       const expectedError = { 
         error: 'Failed to Delete: Project does not exist' 
       };
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(expectedError);
+    })
+  })
+
+  describe('DELETE /api/v1/palettes/:id', () => {
+    it.skip('should delete palettes using the id param', async () => {
+      const palette = await db('palettes').first();
+      const paletteToDelete = palette.id;
+
+      const response = await request(app)
+        .delete(`/api/v1/palettes/${paletteToDelete}`);
+      const deleted = await db('palettes').where( { id: paletteToDelete });
+      expect(deleted).toEqual(response.body);
+    })
+
+    it('should respond with an error if id param is not in the palettes db', async () => {
+      const response = await request(app)
+        .delete('/api/v1/palettes/-1');
+
+      const expectedError = { 
+        error: 'Failed to Delete: Palette does not exist' 
+      };
+
       expect(response.status).toBe(404);
       expect(response.body).toEqual(expectedError);
     })
