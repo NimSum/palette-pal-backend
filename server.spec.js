@@ -189,6 +189,8 @@ describe('Server', () => {
       const response = await request(app)
         .delete(`/api/v1/projects/${projectToDelete}`);
       const deleted = await db('projects').where( { id: projectToDelete });
+
+      expect(response.status).toBe(202);
       expect(deleted).toEqual(response.body);
     })
 
@@ -212,6 +214,8 @@ describe('Server', () => {
       const response = await request(app)
         .delete(`/api/v1/palettes/${paletteToDelete}`);
       const deleted = await db('palettes').where( { id: paletteToDelete });
+      
+      expect(response.status).toBe(202);
       expect(deleted).toEqual(response.body);
     })
 
@@ -225,6 +229,38 @@ describe('Server', () => {
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual(expectedError);
+    })
+  })
+
+  describe('PUT /api/v1/projects/:id', () => {
+    it('should update the project name on valid requests', async () => {
+      const project = await db('projects').first();
+      const projectToUpdate = project.id;
+      const newName = { name: "NIMDIMSUM" }
+      
+      const response = await request(app)
+        .put(`/api/v1/projects/${projectToUpdate}`)
+        .send(newName)
+        
+      const updated = await db('projects').where( { id: projectToUpdate }).first();
+      
+      expect(response.status).toBe(202);
+      expect(updated.name).toEqual(newName.name);
+
+    })
+    
+    it('should respond with an error for invalid project id', async () => {
+      const newName = { name: "NIMDIMSUM" }
+      const error = { 
+        error: 'Failed to update: Project does not exist' 
+      }
+      
+      const response = await request(app)
+        .put('/api/v1/projects/-1')
+        .send(newName);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(error);
     })
   })
 })
