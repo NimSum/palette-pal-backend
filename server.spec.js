@@ -149,9 +149,9 @@ describe('Server', () => {
         .send(newPalette);
       const id = parseInt(response.body)
       
-      const project = await db('palettes').where({ id }).first();
+      const palette = await db('palettes').where({ id }).first();
 
-      expect(project.name).toEqual(newPalette.name);
+      expect(palette.name).toEqual(newPalette.name);
     })
     
     it('should reject post if required param is invalid or not recieved', async () => {
@@ -179,7 +179,28 @@ describe('Server', () => {
       expect(response.status).toBe(500);
       expect(error).toEqual(expected);
     })
+  })
 
-    
+  describe('DELETE /api/v1/projects/:id', () => {
+    it.skip('should delete projects using the id param', async () => {
+      const project = await db('projects').first();
+      const idToDelete = project.id;
+
+      const response = await request(app)
+        .delete(`/api/v1/projects/${idToDelete}`);
+      const deleted = await db('projects').where( { id: idToDelete });
+      expect(deleted).toEqual(response.body);
+    })
+
+    it('should respond with an error if id param is not in the projects db', async () => {
+
+      const response = await request(app)
+        .delete('/api/v1/projects/-1');
+      const expectedError = { 
+        error: 'Failed to Delete: Project does not exist' 
+      };
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(expectedError);
+    })
   })
 })
