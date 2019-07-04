@@ -11,7 +11,9 @@ exports.up = function(knex) {
       table.increments('id').primary();
       table.string('name');
       table.integer('project_id').unsigned();
-      table.foreign('project_id').references('projects.id')
+      table.foreign('project_id')
+        .references('projects.id')
+        .onDelete('CASCADE')
       table.string('color_1');
       table.string('color_2');
       table.string('color_3');
