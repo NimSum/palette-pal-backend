@@ -97,6 +97,7 @@ describe('Server', () => {
       
       const project = await db('projects').where({ id }).first();
 
+      expect(response.status).toBe(201);
       expect(project.name).toEqual(newProject.name);
     })
 
@@ -151,6 +152,7 @@ describe('Server', () => {
       
       const palette = await db('palettes').where({ id }).first();
 
+      expect(response.status).toBe(201);
       expect(palette.name).toEqual(newPalette.name);
     })
     
