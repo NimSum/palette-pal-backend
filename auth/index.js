@@ -66,15 +66,15 @@ router.post('/login', (req, res) => {
             .then(result => {
               const isSecure = req.app.get('env') !== 'development';
               if (result) {
-                res.cookie('user_id', user.userId, {
+                res.cookie({user_id: user.user_id}, {
                   httpOnly: true,
                   signed: true,
                   secure: isSecure
                 })
+                res.json({
+                  logged_in: result
+                })
               }
-              res.json({
-                logged_in: result
-              })
             })
         }
       })

@@ -15,7 +15,7 @@ app.set('port', process.env.PORT || 3001);
 // Create a environment var called COOKIE_SECRET
 // put it in a .env file
 // put it in place of 'keyboard_car' i.e process.env.COOKIE_SECRET
-app.use(cookieParser('nimdimsum'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
