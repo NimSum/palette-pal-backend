@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
 const cors = require('cors');
+const auth = require('./auth');
 
 app.use(bodyParser.json());
 
@@ -173,5 +174,6 @@ app.put('/api/v1/palettes/:id', (req, res) => {
   })
   .catch(error => res.status(500).json({ error }))  
 })
+
 
 module.exports = app;
