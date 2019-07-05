@@ -80,14 +80,14 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 })
 
 app.post('/api/v1/projects', (req, res) => {
-  let { name } = req.body;
-  if (!name) {
+  let { project_name } = req.body;
+  if (!project_name) {
     return res.status(422).send({
-      error: 'Required parameter "name" is missing'
+      error: 'Required parameter "project_name" is missing'
     });
   }
 
-  database('projects').insert({ name }, 'id')
+  database('projects').insert({ project_name }, 'id')
   .then(projectId => res.status(201).json(projectId))
   .catch(error => res.status(500).json({ error }))
 });
@@ -95,7 +95,7 @@ app.post('/api/v1/projects', (req, res) => {
 app.post('/api/v1/palettes', (req, res) => {
   let newPalette = req.body;
   const parameters = [
-    'name', 
+    'palette_name', 
     'project_id',
     'color_1', 
     'color_2', 
@@ -151,11 +151,11 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
 
 app.put('/api/v1/projects/:id', (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { project_name } = req.body;
 
   database('projects')
   .where({ id })
-  .update({ name }, ['id'])
+  .update({ project_name }, ['id'])
   .then((id) => {
     if (!id.length) {
       res.status(404).json({ 

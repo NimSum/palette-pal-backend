@@ -3,13 +3,13 @@ exports.up = function(knex) {
   return Promise.all([
     knex.schema.createTable('projects', table => {
       table.increments('id').primary();
-      table.string('name');
+      table.string('project_name');
       table.timestamps(true, true);
     }),
 
     knex.schema.createTable('palettes', table => {
       table.increments('id').primary();
-      table.string('name');
+      table.string('palette_name');
       table.integer('project_id').unsigned();
       table.foreign('project_id')
         .references('projects.id')

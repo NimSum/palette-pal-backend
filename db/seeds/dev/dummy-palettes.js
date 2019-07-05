@@ -1,12 +1,12 @@
 const dummyData = require('../seeds-data/dummyData.json');
 
 const addProject = (knex, project) => {
-  return knex('projects').insert({name: project.name}, 'id')
+  return knex('projects').insert({project_name: project.name}, 'id')
   .then(projectID => {
     const palPromises = [];
     project.palettes.forEach(palette => {
       palPromises.push(knex('palettes').insert({
-        name: palette.name,
+        palette_name: palette.name,
         color_1: palette.color_1,
         color_2: palette.color_2,
         color_3: palette.color_3,
