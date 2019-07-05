@@ -8,7 +8,7 @@ const cors = require('cors');
 const auth = require('./auth');
 
 app.use(bodyParser.json());
-
+app.use('/auth', auth);
 app.use(cors());
 app.set('port', process.env.PORT || 3001);
 
