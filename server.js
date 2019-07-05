@@ -9,7 +9,7 @@ const cors = require('cors');
 app.use(bodyParser.json());
 
 app.use(cors());
-app.set('port', process.env.PORT || 3001);
+app.set('port', process.env.PORT || 3005);
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
@@ -20,14 +20,14 @@ app.get('/api/v1/projects', (req, res) => {
 
   if (palettes === 'included') {
     database('palettes')
-    .join('projects', 'projects.id', '=', 'palettes.project_id')
-    .then(projects => res.status(200).json(projects))
-    .catch(error => res.status(500).json({ error }))
+      .join('projects', 'projects.id', '=', 'palettes.project_id')
+      .then(projects => res.status(200).json(projects))
+      .catch(error => res.status(500).json({ error }))
   } else {
     database('projects')
-    .select()
-    .then(projects => res.status(200).json(projects))
-    .catch(error => res.status(500).json({ error }))
+      .select()
+      .then(projects => res.status(200).json(projects))
+      .catch(error => res.status(500).json({ error }))
   }
 });
 
@@ -48,10 +48,19 @@ app.get('/api/v1/projects/:id', (req, res) => {
 })
 
 app.get('/api/v1/palettes', (req, res) => {
-  database('palettes')
-  .select()
-    .then(palettes => res.status(200).json(palettes))
-  .catch(error => res.status(500).json({ error }))
+  const { project_id } = req.query;
+
+  if (project_id) {
+    database('palettes')
+      .where({ project_id })
+      .then(palettes => res.status(200).json(palettes))
+      .catch(error => res.status(500).json({ error }))
+  } else {
+    database('palettes')
+      .select()
+      .then(palettes => res.status(200).json(palettes))
+      .catch(error => res.status(500).json({ error }))
+  }
 });
 
 app.get('/api/v1/palettes/:id', (req, res) => {
