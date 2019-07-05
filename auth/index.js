@@ -59,11 +59,16 @@ router.post('/login', (req, res) => {
   if (validateUser(req.body)) {
     getUser(email)
       .then(user => {
-        
-        console.log('user', user);
-        res.json({
-          message: 'Loggging in... 🔓'
-        })
+        if (!user) {
+          res.status(403).json({ error: "Invalid login" })
+        } else {
+          bcrypt.compare(password, user.password)
+            .then(result => {
+              res.json({
+                logged_in: result
+              })
+            })
+        }
       })
   } else {
     res.status(403).json({ error: "Invalid login" })
