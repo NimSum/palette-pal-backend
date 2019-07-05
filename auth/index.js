@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[environment];
@@ -22,7 +23,7 @@ function validateUser(user) {
 }
 
 router.post('/signup', (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
   if (validateUser(req.body)) {
     database('users')
@@ -30,10 +31,12 @@ router.post('/signup', (req, res) => {
       .first()
       .then(user => {
         if (!user) {
-          res.json({
-            user,
-            message: '✅'
-          })
+          bcrypt.hash(password, 10)
+            .then(hash => {
+              database('users')
+                .insert({ email, password: hash }, 'user_id')
+                .then(userId => res.status(201).json(userId))
+            })
         } else {
           res.status(400).json({ error: "Email in use" })
         }
