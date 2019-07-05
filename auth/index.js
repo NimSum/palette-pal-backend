@@ -16,20 +16,27 @@ router.get('/', (req, res) => {
 function validateUser(user) {
   const validEmail = typeof user.email === 'string' &&
   user.email.trim() !== '';
+
   const validPassword = typeof user.password === 'string' &&
   user.password.trim() !== '' &&
   user.password.length >= 6;
-  return validEmail && validPassword;                                          
+
+  return validEmail && validPassword;
+}
+
+function getUser(email) {
+  return database('users')
+  .where({ email })
+  .first();
 }
 
 router.post('/signup', (req, res) => {
   const { email, password } = req.body;
 
   if (validateUser(req.body)) {
-    database('users')
-      .where({ email })
-      .first()
+    getUser(email)
       .then(user => {
+        console.log(user)
         if (!user) {
           bcrypt.hash(password, 10)
             .then(hash => {
@@ -43,6 +50,23 @@ router.post('/signup', (req, res) => {
       });
   } else {
     res.status(403).json({ error: "Invalid user" })
+  }
+})
+
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (validateUser(req.body)) {
+    getUser(email)
+      .then(user => {
+        
+        console.log('user', user);
+        res.json({
+          message: 'Loggging in... 🔓'
+        })
+      })
+  } else {
+    res.status(403).json({ error: "Invalid login" })
   }
 })
 
