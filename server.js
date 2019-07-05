@@ -17,7 +17,7 @@ app.listen(app.get('port'), () => {
 
 app.get('/api/v1/projects', (req, res) => {
   const { palettes } = req.query;
-  
+
   if (palettes === 'included') {
     database('palettes')
     .join('projects', 'projects.id', '=', 'palettes.project_id')
@@ -78,17 +78,9 @@ app.post('/api/v1/projects', (req, res) => {
     });
   }
 
-  database('projects')
-  .where({ name })
-  .then(project => {
-    if (!!project.length) {
-      res.status(409).json({ error: 'Project name already exists' })
-    } else {
-      database('projects').insert({ name }, 'id')
-      .then(projectId => res.status(201).json(projectId))
-      .catch(error => res.status(500).json({ error }))
-    }
-  }).catch(error => res.status(500).json({ error }))
+  database('projects').insert({ name }, 'id')
+  .then(projectId => res.status(201).json(projectId))
+  .catch(error => res.status(500).json({ error }))
 });
 
 app.post('/api/v1/palettes', (req, res) => {
