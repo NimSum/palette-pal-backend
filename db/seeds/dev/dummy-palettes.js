@@ -30,6 +30,7 @@ exports.seed = function(knex) {
     })
     .then(() => {
       const promises = [];
+      promises.push(addProject(knex, { name: 'Uncategorized', palettes: [] }))
       dummyData.forEach(project => promises.push(addProject(knex, project)))
       return Promise.all(promises)
     })
