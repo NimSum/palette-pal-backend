@@ -64,6 +64,14 @@ router.post('/login', (req, res) => {
         } else {
           bcrypt.compare(password, user.password)
             .then(result => {
+              const isSecure = req.app.get('env') !== 'development';
+              if (result) {
+                res.cookie('user_id', user.userId, {
+                  httpOnly: true,
+                  signed: true,
+                  secure: isSecure
+                })
+              }
               res.json({
                 logged_in: result
               })
