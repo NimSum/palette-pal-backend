@@ -9,17 +9,26 @@ const cors = require('cors');
 app.use(bodyParser.json());
 
 app.use(cors());
-app.set('port', process.env.PORT || 30001);
+app.set('port', process.env.PORT || 3001);
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
 });
 
 app.get('/api/v1/projects', (req, res) => {
-  database('projects')
-  .select()
+  const { palettes } = req.query;
+
+  if (palettes === 'included') {
+    database('palettes')
+    .join('projects', 'projects.id', '=', 'palettes.project_id')
     .then(projects => res.status(200).json(projects))
-  .catch(error => res.status(500).json({ error }))
+    .catch(error => res.status(500).json({ error }))
+  } else {
+    database('projects')
+    .select()
+    .then(projects => res.status(200).json(projects))
+    .catch(error => res.status(500).json({ error }))
+  }
 });
 
 app.get('/api/v1/projects/:id', (req, res) => {
@@ -70,8 +79,8 @@ app.post('/api/v1/projects', (req, res) => {
   }
 
   database('projects').insert({ name }, 'id')
-    .then(projectId => res.status(201).json(projectId))
-    .catch(error => res.status(500).json({ error }))
+  .then(projectId => res.status(201).json(projectId))
+  .catch(error => res.status(500).json({ error }))
 });
 
 app.post('/api/v1/palettes', (req, res) => {

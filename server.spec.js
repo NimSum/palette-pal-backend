@@ -25,7 +25,18 @@ describe('Server', () => {
 			const result = response.body;
 
 			expect(result).toEqual(expectedProjects);
-		});
+    });
+    
+    it('should projects with palettes included if query string is set to included', async () => {
+
+      const response = await request(app)
+        .get('/api/v1/projects?palettes=included');
+      const result = response.body[0];
+
+      expect(result).toHaveProperty('color_1');
+			expect(result).toHaveProperty('color_3');
+			expect(result).toHaveProperty('color_5');      
+    })
 	});
 
 	describe('GET /api/v1/projects/:id', () => {
