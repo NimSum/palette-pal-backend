@@ -19,10 +19,9 @@ app.get('/api/v1/projects', (req, res) => {
   const { palettes } = req.query;
 
   if (palettes === 'included') {
-    database('palettes')
-      .join('projects', 'projects.id', '=', 'palettes.project_id')
-      .then(projects => res.status(200).json(projects))
-      .catch(error => res.status(500).json({ error }))
+    database.raw('SELECT proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal LEFT JOIN projects AS proj ON pal.project_id = proj.id ORDER BY proj.id')
+    .then(projects => res.status(200).json(projects.rows))
+    .catch(error => res.status(500).json({ error }))
   } else {
     database('projects')
       .select()
