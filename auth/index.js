@@ -56,10 +56,11 @@ router.post('/login', (req, res) => {
                   expiresIn: '7d'
                 }
                 // replace secret key with env var
-                jwt.sign({ email }, process.env.SECRET_KEY, options, (err, token) => {
+                jwt.sign({ user }, process.env.SECRET_KEY, options, (err, token) => {
                   if (err) res.sendStatus(500);
                   res.json({
-                    token
+                    token,
+                    user_id: user.id
                   })
                 })
               } else res.status(403).json({ error: "Invalid login"})

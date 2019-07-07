@@ -73,19 +73,24 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 })
 
 app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
-  let { name } = req.body;
-  if (!name) {
-    return res.status(422).send({
-      error: 'Required parameter "name" is missing'
+  let { name, user_id } = req.body;
+  for (let param of ['name', 'user_id']) {
+    if (!req.body[param])
+      return res.status(422).send({
+        error: `Required parameter ${param} is missing`
     });
   }
 
-  database('projects').insert({ name }, 'id')
-  .then(projectId => res.status(201).json(projectId))
-  .catch(error => res.status(500).json({ error }))
+  if (res.auth.user.id === user_id) {
+    database('projects').insert({ name, user_id }, 'id')
+    .then(projectId => res.status(201).json(projectId))
+    .catch(error => res.status(500).json({ error }))
+  } else {
+    res.sendStatus(403);
+  }
 });
 
-app.post('/api/v1/palettes', (req, res) => {
+app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
   let newPalette = req.body;
   const parameters = [
     'name', 
@@ -97,22 +102,26 @@ app.post('/api/v1/palettes', (req, res) => {
     'color_5', 
   ];
 
-  for (let requiredParam of parameters) {
-    if (!newPalette[requiredParam] ) {
-      res.status(422).json({ error: 
-        `Expected parameters of: ${parameters.join(', ')}. Missing: ${ requiredParam }`})
-      return;
+  if (res.auth.user.id === user_id) {
+    for (let requiredParam of parameters) {
+      if (!newPalette[requiredParam] ) {
+        res.status(422).json({ error: 
+          `Expected parameters of: ${parameters.join(', ')}. Missing: ${ requiredParam }`})
+        return;
+      }
     }
-  }
 
-  database('palettes').insert(newPalette, 'id')
-  .then(paletteId => res.status(201).json(paletteId))
-  .catch(error => res.status(500).json({ error }))
+    database('palettes').insert(newPalette, 'id')
+    .then(paletteId => res.status(201).json(paletteId))
+    .catch(error => res.status(500).json({ error }))
+  } else {
+    res.sendStatus(403);
+  }
 })
 
 app.delete('/api/v1/projects/:id', (req, res) => {
   const { id } = req.params;
-
+  
   database('projects')
   .where({ id })
   .del()
