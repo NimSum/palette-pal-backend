@@ -158,38 +158,47 @@ app.delete('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
   }
 })
 
-app.put('/api/v1/projects/:id', (req, res) => {
+app.put('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  database('projects')
-  .where({ id })
-  .update({ name }, ['id'])
-  .then((id) => {
-    if (!id.length) {
-      res.status(404).json({ 
-        error: 'Failed to update: Project does not exist' 
-      });
-    } else res.sendStatus(202);
-  })
-  .catch(error => res.status(500).json({ error }))  
+  if (res.auth.user.id === user_id) {
+    database('projects')
+    .where({ id })
+    .update({ name }, ['id'])
+    .then((id) => {
+      if (!id.length) {
+        res.status(404).json({ 
+          error: 'Failed to update: Project does not exist' 
+        });
+      } else res.sendStatus(202);
+    })
+    .catch(error => res.status(500).json({ error }))  
+  } else {
+    res.sendStatus(403);
+  }
+
 })
 
-app.put('/api/v1/palettes/:id', (req, res) => {
+app.put('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
   const updatedPalette = req.body;
 
-  database('palettes')
-  .where({ id })
-  .update({ ...updatedPalette }, ['id'])
-  .then((id) => {
-    if (!id.length) {
-      res.status(404).json({ 
-        error: 'Failed to update: Palette does not exist' 
-      });
-    } else res.sendStatus(202);
-  })
-  .catch(error => res.status(500).json({ error }))  
+  if (res.auth.user.id === user_id) {
+    database('palettes')
+    .where({ id })
+    .update({ ...updatedPalette }, ['id'])
+    .then((id) => {
+      if (!id.length) {
+        res.status(404).json({ 
+          error: 'Failed to update: Palette does not exist' 
+        });
+      } else res.sendStatus(202);
+    })
+    .catch(error => res.status(500).json({ error }))  
+  } else {
+    res.sendStatus(403);
+  }
 })
 
 
