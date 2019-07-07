@@ -73,16 +73,15 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 })
 
 app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
-  let { name, user_id } = req.body;
-  for (let param of ['name', 'user_id']) {
-    if (!req.body[param])
-      return res.status(422).send({
-        error: `Required parameter ${param} is missing`
-    });
-  }
+  let { project_name } = req.body;
+  let user_id = parseInt(req.query.user_id);
+  if (!project_name)
+    return res.status(422).send({
+      error: 'Required parameter project_name is missing'
+  });
 
   if (res.auth.user.id === user_id) {
-    database('projects').insert({ name, user_id }, 'id')
+    database('projects').insert({ project_name, user_id }, 'id')
     .then(projectId => res.status(201).json(projectId))
     .catch(error => res.status(500).json({ error }))
   } else {
@@ -92,8 +91,10 @@ app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
 
 app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
   let newPalette = req.body;
+  let user_id = parseInt(req.query.user_id);
+
   const parameters = [
-    'name', 
+    'palette_name', 
     'project_id',
     'color_1', 
     'color_2', 
@@ -121,6 +122,8 @@ app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
 
 app.delete('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
+  const user_id = parseInt(req.query.user_id);
+
   if (res.auth.user.id === user_id) {
     database('projects')
     .where({ id })
@@ -140,6 +143,7 @@ app.delete('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
 
 app.delete('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
+  const user_id = parseInt(req.query.user_id);
 
   if (res.auth.user.id === user_id) {
     database('palettes')
@@ -160,12 +164,13 @@ app.delete('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
 
 app.put('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const user_id = parseInt(req.query.user_id);
+  const { project_name } = req.body;
 
   if (res.auth.user.id === user_id) {
     database('projects')
     .where({ id })
-    .update({ name }, ['id'])
+    .update({ project_name }, ['id'])
     .then((id) => {
       if (!id.length) {
         res.status(404).json({ 
@@ -182,6 +187,7 @@ app.put('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
 
 app.put('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
+  const user_id = parseInt(req.query.user_id);
   const updatedPalette = req.body;
 
   if (res.auth.user.id === user_id) {

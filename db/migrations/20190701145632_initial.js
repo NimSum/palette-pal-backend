@@ -4,14 +4,14 @@ exports.up = function(knex) {
     knex.schema.createTable('users', table => {
       table.increments('id').primary();
       table.string('email').unique().notNullable();
-      table.string('username').unique().notNullable();
+      table.string('user_name').unique().notNullable();
       table.string('password').notNullable();
       table.timestamps(true, true);
     }),
 
     knex.schema.createTable('projects', table => {
       table.increments('id').primary();
-      table.string('name');
+      table.string('project_name');
       table.integer('user_id').unsigned();
       table.foreign('user_id')
         .references('users.id')
@@ -21,7 +21,7 @@ exports.up = function(knex) {
 
     knex.schema.createTable('palettes', table => {
       table.increments('id').primary();
-      table.string('name');
+      table.string('palette_name');
       table.integer('project_id').unsigned();
       table.foreign('project_id')
         .references('projects.id')

@@ -15,20 +15,19 @@ router.get('/', (req, res) => {
 })
 
 router.post('/signup', (req, res) => {
-  const { email, password, username } = req.body;
+  const { email, password, user_name } = req.body;
 
-  const validUserName = typeof username === 'string' &&
-  email.trim() !== '';
+  const validUserName = typeof user_name === 'string' &&
+  user_name.trim() !== '';
 
   if (validateInputs(req.body) && validUserName) {
     getUser(email)
       .then(user => {
-        console.log(user)
         if (!user) {
           bcrypt.hash(password, 10)
             .then(hash => {
               database('users')
-                .insert({ email, password: hash, username }, 'id')
+                .insert({ email, password: hash, user_name }, 'id')
                 .then(userId => res.status(201).json(userId))
             })
         } else {
