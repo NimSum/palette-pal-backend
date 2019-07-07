@@ -11,25 +11,26 @@ app.use(bodyParser.json());
 app.use('/auth', auth.router);
 app.use(cors());
 app.set('port', process.env.PORT || 3001);
-// app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
 });
 
 app.get('/api/v1/projects', (req, res) => {
-  const { palettes } = req.query;
+  const { palettes, user_id } = req.query;
 
   if (palettes === 'included') {
-    database('palettes')
-    .join('projects', 'projects.id', '=', 'palettes.project_id')
-    .then(projects => res.status(200).json(projects))
+    database.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id`)
+    .then(projects => {
+      const filtered = projects.rows.filter(proj => proj.user_id === parseInt(user_id));
+      res.status(200).json(filtered)
+    })
     .catch(error => res.status(500).json({ error }))
   } else {
     database('projects')
-    .select()
-    .then(projects => res.status(200).json(projects))
-    .catch(error => res.status(500).json({ error }))
+      .select()
+      .then(projects => res.status(200).json(projects))
+      .catch(error => res.status(500).json({ error }))
   }
 });
 
