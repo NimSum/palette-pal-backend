@@ -8,7 +8,7 @@ const cors = require('cors');
 const auth = require('./auth');
 
 app.use(bodyParser.json());
-app.use('/auth', auth);
+app.use('/auth', auth.router);
 app.use(cors());
 app.set('port', process.env.PORT || 3001);
 // app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -72,7 +72,7 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .catch(error => res.status(500).json({ error }));
 })
 
-app.post('/api/v1/projects', (req, res) => {
+app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
   let { name } = req.body;
   if (!name) {
     return res.status(422).send({

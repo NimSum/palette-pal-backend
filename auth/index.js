@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const verifyToken = require('./tokenVerification');
-
+require('dotenv').config();
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[environment];
 const database = require('knex')(configuration);
@@ -15,30 +14,13 @@ router.get('/', (req, res) => {
   })
 })
 
-function validateInputs(user) {
-  const validEmail = typeof user.email === 'string' &&
-  user.email.trim() !== '';
-
-  // const validUserName = typeof user.username === 'string' &&
-  // user.email.trim() !== '';
-
-  const validPassword = typeof user.password === 'string' &&
-  user.password.trim() !== '' &&
-  user.password.length >= 6;
-
-  return validEmail && validPassword;
-}
-
-function getUser(email) {
-  return database('users')
-  .where({ email })
-  .first();
-}
-
 router.post('/signup', (req, res) => {
   const { email, password, username } = req.body;
 
-  if (validateInputs(req.body)) {
+  const validUserName = typeof username === 'string' &&
+  email.trim() !== '';
+
+  if (validateInputs(req.body) && validUserName) {
     getUser(email)
       .then(user => {
         console.log(user)
@@ -74,12 +56,13 @@ router.post('/login', (req, res) => {
                   expiresIn: '7d'
                 }
                 // replace secret key with env var
-                jwt.sign({ user }, 'secretkey', options, (err, token) => {
+                jwt.sign({ email }, process.env.SECRET_KEY, options, (err, token) => {
+                  if (err) res.sendStatus(500);
                   res.json({
                     token
                   })
                 })
-              }
+              } else res.status(403).json({ error: "Invalid login"})
             })
         }
       })
@@ -89,12 +72,46 @@ router.post('/login', (req, res) => {
 })
 
 router.post('/projects', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'secretkey', (err, authData) => {
-    if (err) res.sendStatus(403);
-    res.json({
-      message: 'Success!',
-      authData
-    })
-  })
+  res.json(res.auth);
 })
-module.exports = router;
+
+function verifyToken(req, res, next) {
+  // get auth header value
+  // TOKENT FORMAT:
+  // Authorization: Bearer <token> ?? maybe not??
+  const bearerHeader = req.headers.authorization;
+  if (bearerHeader !== undefined) {
+    const token = bearerHeader.split(' ')[1];
+    req.token = token;
+    // replace secret key with env var
+    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+      if (err) {
+        res.sendStatus(403)
+      } else {
+        res.auth = authData;
+        next();
+      }
+    })
+  } else {
+    res.sendStatus(403);
+  }
+}
+
+function validateInputs(user) {
+  const validEmail = typeof user.email === 'string' &&
+  user.email.trim() !== '';
+
+  const validPassword = typeof user.password === 'string' &&
+  user.password.trim() !== '' &&
+  user.password.length >= 6;
+
+  return validEmail && validPassword;
+}
+
+function getUser(email) {
+  return database('users')
+  .where({ email })
+  .first();
+}
+
+module.exports = { router, verifyToken };

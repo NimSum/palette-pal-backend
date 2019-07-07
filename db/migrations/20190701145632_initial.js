@@ -3,13 +3,9 @@ exports.up = function(knex) {
   return Promise.all([
     knex.schema.createTable('users', table => {
       table.increments('id').primary();
-      table.text('email').unique().notNullable();
-      table.text('username').unique().notNullable();
-      table.text('password').notNullable();
-      table.text('token');
-      table.boolean('is_active')
-        .notNullable()
-        .defaultTo(true)
+      table.string('email').unique().notNullable();
+      table.string('username').unique().notNullable();
+      table.string('password').notNullable();
       table.timestamps(true, true);
     }),
 
