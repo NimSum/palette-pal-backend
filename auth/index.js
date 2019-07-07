@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const verifyToken = require('./tokenVerification');
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[environment];
@@ -18,6 +19,9 @@ function validateInputs(user) {
   const validEmail = typeof user.email === 'string' &&
   user.email.trim() !== '';
 
+  // const validUserName = typeof user.username === 'string' &&
+  // user.email.trim() !== '';
+
   const validPassword = typeof user.password === 'string' &&
   user.password.trim() !== '' &&
   user.password.length >= 6;
@@ -32,7 +36,7 @@ function getUser(email) {
 }
 
 router.post('/signup', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
 
   if (validateInputs(req.body)) {
     getUser(email)
@@ -42,7 +46,7 @@ router.post('/signup', (req, res) => {
           bcrypt.hash(password, 10)
             .then(hash => {
               database('users')
-                .insert({ email, password: hash }, 'user_id')
+                .insert({ email, password: hash, username }, 'id')
                 .then(userId => res.status(201).json(userId))
             })
         } else {
@@ -56,7 +60,7 @@ router.post('/signup', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
-  
+
   if (validateInputs(req.body)) {
     getUser(email)
       .then(user => {
@@ -66,8 +70,14 @@ router.post('/login', (req, res) => {
           bcrypt.compare(password, user.password)
             .then(result => {
               if (result) {
-                res.json({
-                  logged_in: result
+                let options = {
+                  expiresIn: '7d'
+                }
+                // replace secret key with env var
+                jwt.sign({ user }, 'secretkey', options, (err, token) => {
+                  res.json({
+                    token
+                  })
                 })
               }
             })
@@ -77,5 +87,6 @@ router.post('/login', (req, res) => {
     res.status(403).json({ error: "Invalid login" })
   }
 })
+
 
 module.exports = router;

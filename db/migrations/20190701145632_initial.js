@@ -4,6 +4,7 @@ exports.up = function(knex) {
     knex.schema.createTable('users', table => {
       table.increments('id').primary();
       table.text('email').unique().notNullable();
+      table.text('username').unique().notNullable();
       table.text('password').notNullable();
       table.text('token');
       table.boolean('is_active')
