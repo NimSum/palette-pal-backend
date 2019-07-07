@@ -88,5 +88,13 @@ router.post('/login', (req, res) => {
   }
 })
 
-
+router.post('/projects', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'secretkey', (err, authData) => {
+    if (err) res.sendStatus(403);
+    res.json({
+      message: 'Success!',
+      authData
+    })
+  })
+})
 module.exports = router;
