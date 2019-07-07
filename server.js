@@ -119,36 +119,43 @@ app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
   }
 })
 
-app.delete('/api/v1/projects/:id', (req, res) => {
+app.delete('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
-  
-  database('projects')
-  .where({ id })
-  .del()
-  .then((delCount) => {
-    if (!delCount) {
-      res.status(404).json({ 
-        error: 'Failed to Delete: Project does not exist' 
-      }) 
-    } else res.sendStatus(202);
-  })
-  .catch(error => res.status(500).json({ error }))
+  if (res.auth.user.id === user_id) {
+    database('projects')
+    .where({ id })
+    .del()
+    .then((delCount) => {
+      if (!delCount) {
+        res.status(404).json({ 
+          error: 'Failed to Delete: Project does not exist' 
+        }) 
+      } else res.sendStatus(202);
+    })
+    .catch(error => res.status(500).json({ error }))
+  } else {
+    res.sendStatus(403);
+  }
 })
 
-app.delete('/api/v1/palettes/:id', (req, res) => {
+app.delete('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
   const { id } = req.params;
 
-  database('palettes')
-  .where({ id })
-  .del()
-  .then((delCount) => {
-    if (!delCount) {
-      res.status(404).json({ 
-        error: 'Failed to Delete: Palette does not exist' 
-      }) 
-    } else res.sendStatus(202);
-  })
-  .catch(error => res.status(500).json({ error }))
+  if (res.auth.user.id === user_id) {
+    database('palettes')
+    .where({ id })
+    .del()
+    .then((delCount) => {
+      if (!delCount) {
+        res.status(404).json({ 
+          error: 'Failed to Delete: Palette does not exist' 
+        }) 
+      } else res.sendStatus(202);
+    })
+    .catch(error => res.status(500).json({ error }))
+  } else {
+    res.sendStatus(403);
+  }
 })
 
 app.put('/api/v1/projects/:id', (req, res) => {
