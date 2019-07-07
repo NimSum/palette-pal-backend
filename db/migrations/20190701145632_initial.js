@@ -1,9 +1,24 @@
 
 exports.up = function(knex) {
   return Promise.all([
+    knex.schema.createTable('users', table => {
+      table.increments('id').primary();
+      table.text('email').unique().notNullable();
+      table.text('password').notNullable();
+      table.text('token');
+      table.boolean('is_active')
+        .notNullable()
+        .defaultTo(true)
+      table.timestamps(true, true);
+    }),
+
     knex.schema.createTable('projects', table => {
       table.increments('id').primary();
       table.string('name');
+      table.integer('user_id').unsigned();
+      table.foreign('user_id')
+        .references('users.id')
+        .onDelete('CASCADE')
       table.timestamps(true, true);
     }),
 
@@ -27,6 +42,7 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return Promise.all([
     knex.schema.dropTable('palettes'),
-    knex.schema.dropTable('projects')
+    knex.schema.dropTable('projects'),
+    knex.schema.dropTable('users'),
   ])
 };

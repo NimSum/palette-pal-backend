@@ -3,7 +3,7 @@
 module.exports = {
   development: {
     client: 'pg',
-    connection: 'postgres://localhost/palettes',
+    connection: 'postgres://localhost/palettes_auth',
     migrations: {
       directory: './db/migrations'
     },
@@ -27,7 +27,7 @@ module.exports = {
 
   test: {
     client: 'pg',
-    connection: 'postgres://localhost/palettes_test',
+    connection: 'postgres://localhost/palettes_auth_test',
     migrations: {
       directory: './db/migrations'
     },

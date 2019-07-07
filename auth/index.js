@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[environment];
@@ -13,7 +14,7 @@ router.get('/', (req, res) => {
   })
 })
 
-function validateUser(user) {
+function validateInputs(user) {
   const validEmail = typeof user.email === 'string' &&
   user.email.trim() !== '';
 
@@ -33,7 +34,7 @@ function getUser(email) {
 router.post('/signup', (req, res) => {
   const { email, password } = req.body;
 
-  if (validateUser(req.body)) {
+  if (validateInputs(req.body)) {
     getUser(email)
       .then(user => {
         console.log(user)
@@ -55,8 +56,8 @@ router.post('/signup', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
-
-  if (validateUser(req.body)) {
+  
+  if (validateInputs(req.body)) {
     getUser(email)
       .then(user => {
         if (!user) {
@@ -64,13 +65,7 @@ router.post('/login', (req, res) => {
         } else {
           bcrypt.compare(password, user.password)
             .then(result => {
-              const isSecure = req.app.get('env') !== 'development';
               if (result) {
-                res.cookie({user_id: user.user_id}, {
-                  httpOnly: true,
-                  signed: true,
-                  secure: isSecure
-                })
                 res.json({
                   logged_in: result
                 })
