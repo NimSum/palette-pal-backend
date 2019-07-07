@@ -16,7 +16,6 @@ router.get('/', (req, res) => {
 
 router.post('/signup', (req, res) => {
   const { email, password, user_name } = req.body;
-
   const validUserName = typeof user_name === 'string' &&
   user_name.trim() !== '';
 
@@ -28,7 +27,10 @@ router.post('/signup', (req, res) => {
             .then(hash => {
               database('users')
                 .insert({ email, password: hash, user_name }, 'id')
-                .then(userId => res.status(201).json(userId))
+                .then(user_id => {
+                  addDefaultProject(user_id)
+                  res.status(201).json(...user_id)
+                })
             })
         } else {
           res.status(400).json({ error: "Email in use" })
@@ -54,12 +56,12 @@ router.post('/login', (req, res) => {
                 let options = {
                   expiresIn: '7d'
                 }
-                // replace secret key with env var
-                jwt.sign({ user }, process.env.SECRET_KEY, options, (err, token) => {
+                jwt.sign({ user }, process.env.SECRET_KEY, options, async (err, token) => {
                   if (err) res.sendStatus(500);
                   res.json({
                     token,
-                    user_id: user.id
+                    user_id: user.id,
+                    projects: await getUserData(user.id)
                   })
                 })
               } else res.status(403).json({ error: "Invalid login"})
@@ -71,9 +73,17 @@ router.post('/login', (req, res) => {
   }
 })
 
-router.post('/projects', verifyToken, (req, res) => {
-  res.json(res.auth);
-})
+function getUserData(userId) {
+  return database.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id ORDER BY proj.updated_at `)
+  .then(projects => {
+    return projects.rows.filter(proj => proj.user_id === parseInt(userId));
+  })
+}
+
+async function addDefaultProject(userId) {
+  await database('projects')
+    .insert({ project_name: "Uncategorized", user_id: parseInt(userId) })
+}
 
 function verifyToken(req, res, next) {
   // get auth header value
