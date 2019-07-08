@@ -200,7 +200,20 @@ describe('Server', () => {
 			expect(error).toEqual(expected);
     });
     
-   
+    it('should reject if user sends invalid token bad user_id query', async () => {
+      const invalidToken = await request(app)
+        .post('/api/v1/palettes?user_id=1')
+        .set({ authorization: 'Bearer 12456' })
+        .send(newPalette)
+      
+      const invalidQueryId = await request(app)
+        .post('/api/v1/palettes?user_id=2')
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(newPalette)
+  
+      expect(invalidToken.status).toBe(403);
+      expect(invalidQueryId.status).toBe(403);
+    });
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
