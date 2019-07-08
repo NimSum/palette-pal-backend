@@ -10,7 +10,7 @@ const auth = require('./auth');
 app.use(bodyParser.json());
 app.use('/auth', auth.router);
 app.use(cors());
-app.set('port', process.env.PORT || 3001);
+app.set('port', process.env.PORT || 3005);
 
 app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
@@ -52,10 +52,19 @@ app.get('/api/v1/projects/:id', (req, res) => {
 })
 
 app.get('/api/v1/palettes', (req, res) => {
-  database('palettes')
-  .select()
-    .then(palettes => res.status(200).json(palettes))
-  .catch(error => res.status(500).json({ error }))
+  const { project_id } = req.query;
+
+  if (project_id) {
+    database('palettes')
+      .where({ project_id })
+      .then(palettes => res.status(200).json(palettes))
+      .catch(error => res.status(500).json({ error }))
+  } else {
+    database('palettes')
+      .select()
+      .then(palettes => res.status(200).json(palettes))
+      .catch(error => res.status(500).json({ error }))
+  }
 });
 
 app.get('/api/v1/palettes/:id', (req, res) => {
@@ -185,7 +194,6 @@ app.put('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
   } else {
     res.sendStatus(403);
   }
-
 })
 
 app.put('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
