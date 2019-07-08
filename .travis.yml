@@ -4,7 +4,8 @@ node_js:
 services:
 - postgresql
 before_script:
-- psql -c 'CREATE DATABASE palettes_test;' -U postgres
+- npm install dotenv
+- psql -c 'CREATE DATABASE palettes_auth_test;' -U postgres
 - npm run migrate-test
 - npm run seed-test
 notifications:

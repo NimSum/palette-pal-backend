@@ -22,10 +22,12 @@
   },
   "homepage": "https://github.com/NimSum/palette-pal-backend#readme",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jest": "^24.8.0",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.18.1",
     "pg": "^7.11.0",
     "supertest": "^4.0.2"

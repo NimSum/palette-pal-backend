@@ -1,37 +1,22 @@
 const dummyData = require('../seeds-data/dummyData.json');
 
-const addProject = (knex, project) => {
-  return knex('projects').insert({project_name: project.name}, 'id')
-  .then(projectID => {
-    const palPromises = [];
-    project.palettes.forEach(palette => {
-      palPromises.push(knex('palettes').insert({
-        palette_name: palette.name,
-        color_1: palette.color_1,
-        color_2: palette.color_2,
-        color_3: palette.color_3,
-        color_4: palette.color_4,
-        color_5: palette.color_5,
-        project_id: projectID[0]
-      }))
-    })
-    return Promise.all(palPromises);
-  })
-  .catch(err => console.log(err))
-}
-
 
 exports.seed = function(knex) {
   return knex('palettes').del()
+    .then(() => knex('projects').del())
     .then(async () => {
-      await knex('projects').del();
+      await knex('users').del();
       await knex.raw('TRUNCATE TABLE palettes RESTART IDENTITY CASCADE');
       await knex.raw('TRUNCATE TABLE projects RESTART IDENTITY CASCADE');
+      await knex.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
     })
-    .then(() => {
+    .then(async () => {
       const promises = [];
-      promises.push(addProject(knex, { name: 'Uncategorized', palettes: [] }))
-      dummyData.forEach(project => promises.push(addProject(knex, project)))
+      promises.push(
+        await knex('users').insert(dummyData.users),
+        await knex('projects').insert(dummyData.projects),
+        await knex('palettes').insert(dummyData.palettes)
+      )
       return Promise.all(promises)
     })
 }

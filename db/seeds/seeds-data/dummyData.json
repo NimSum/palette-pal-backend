@@ -1,22 +1,46 @@
-[{
-  "name":"project0",
-  "palettes":[
+{
+  "users": [
     {
-      "name":"palette0",
-      "color_1":"#488047",
-      "color_2":"#925578",
-      "color_3":"#319547",
-      "color_4":"#796876",
-      "color_5":"#834267"
+      "email": "nimsum@nim.com",
+      "password": "$2b$10$ckr8mpjz70J39GT2Kq6jO.xncSBpj.5jyd7lrY/b2ccE.21XhWyGS",
+      "user_name": "nimsum"
     },
     {
-      "name":"palette0",
-      "color_1":"#433047",
-      "color_2":"#967578",
-      "color_3":"#333547",
-      "color_4":"#798776",
-      "color_5":"#839967"
+      "email": "lynnard@lynne.com",
+      "password": "$2b$10$Hcz3bLyCh2dscxUT7T9QiemJVgRvklvLFscfELoliI.l3jgc13xKG",
+      "user_name": "lynnard"
     }
-  ]
-},
-{"name":"project1","palettes":[{"name":"palette1","color_1":"#606531","color_2":"#238443","color_3":"#766869","color_4":"#087548","color_5":"#912272"}]},{"name":"project2","palettes":[{"name":"palette2","color_1":"#332874","color_2":"#849552","color_3":"#626807","color_4":"#815056","color_5":"#416213"}]},{"name":"project3","palettes":[{"name":"palette3","color_1":"#771386","color_2":"#628362","color_3":"#770842","color_4":"#767976","color_5":"#574825"}]},{"name":"project4","palettes":[{"name":"palette4","color_1":"#414782","color_2":"#844324","color_3":"#112375","color_4":"#951775","color_5":"#968532"}]},{"name":"project5","palettes":[{"name":"palette5","color_1":"#178422","color_2":"#157343","color_3":"#881825","color_4":"#275753","color_5":"#764169"}]},{"name":"project6","palettes":[{"name":"palette6","color_1":"#721714","color_2":"#366815","color_3":"#142208","color_4":"#385945","color_5":"#742588"}]},{"name":"project7","palettes":[{"name":"palette7","color_1":"#756477","color_2":"#037179","color_3":"#783208","color_4":"#831114","color_5":"#887689"}]},{"name":"project8","palettes":[{"name":"palette8","color_1":"#557183","color_2":"#460162","color_3":"#273842","color_4":"#426504","color_5":"#501968"}]},{"name":"project9","palettes":[{"name":"palette9","color_1":"#155254","color_2":"#649551","color_3":"#447274","color_4":"#486878","color_5":"#477475"}]},{"name":"project10","palettes":[{"name":"palette10","color_1":"#539151","color_2":"#377321","color_3":"#915432","color_4":"#626348","color_5":"#487015"}]},{"name":"project11","palettes":[{"name":"palette11","color_1":"#797063","color_2":"#723344","color_3":"#422267","color_4":"#653508","color_5":"#929217"}]},{"name":"project12","palettes":[{"name":"palette12","color_1":"#664677","color_2":"#106916","color_3":"#759233","color_4":"#124463","color_5":"#944082"}]},{"name":"project13","palettes":[{"name":"palette13","color_1":"#646528","color_2":"#243435","color_3":"#119546","color_4":"#084288","color_5":"#614203"}]},{"name":"project14","palettes":[{"name":"palette14","color_1":"#937455","color_2":"#878791","color_3":"#618836","color_4":"#711670","color_5":"#684237"}]},{"name":"project15","palettes":[{"name":"palette15","color_1":"#353587","color_2":"#968876","color_3":"#052157","color_4":"#462402","color_5":"#988476"}]},{"name":"project16","palettes":[{"name":"palette16","color_1":"#933336","color_2":"#036069","color_3":"#751597","color_4":"#817437","color_5":"#834351"}]},{"name":"project17","palettes":[{"name":"palette17","color_1":"#383924","color_2":"#427285","color_3":"#633217","color_4":"#823102","color_5":"#067478"}]},{"name":"project18","palettes":[{"name":"palette18","color_1":"#116175","color_2":"#668587","color_3":"#442388","color_4":"#752447","color_5":"#088782"}]},{"name":"project19","palettes":[{"name":"palette19","color_1":"#447115","color_2":"#484529","color_3":"#050284","color_4":"#148223","color_5":"#354075"}]},{"name":"project20","palettes":[{"name":"palette20","color_1":"#101536","color_2":"#327887","color_3":"#719802","color_4":"#170363","color_5":"#355428"}]},{"name":"project21","palettes":[{"name":"palette21","color_1":"#876784","color_2":"#553140","color_3":"#243832","color_4":"#687348","color_5":"#251617"}]},{"name":"project22","palettes":[{"name":"palette22","color_1":"#592616","color_2":"#625065","color_3":"#618014","color_4":"#551433","color_5":"#384226"}]},{"name":"project23","palettes":[{"name":"palette23","color_1":"#284277","color_2":"#437440","color_3":"#240057","color_4":"#139753","color_5":"#108752"}]},{"name":"project24","palettes":[{"name":"palette24","color_1":"#695357","color_2":"#776836","color_3":"#629852","color_4":"#768737","color_5":"#383247"}]},{"name":"project25","palettes":[{"name":"palette25","color_1":"#774229","color_2":"#748847","color_3":"#785392","color_4":"#865453","color_5":"#282551"}]},{"name":"project26","palettes":[{"name":"palette26","color_1":"#563027","color_2":"#010473","color_3":"#879275","color_4":"#878634","color_5":"#327219"}]}]
+  ],
+  "projects": [
+    {
+      "project_name": "Project ONE",
+      "user_id": 2
+    },
+    {
+      "project_name": "Project TWO",
+      "user_id": 1
+    }
+  ],
+  "palettes": [
+    {
+      "color_1": "#123456",
+      "color_2": "#654321",
+      "color_3": "#333547",
+      "color_4": "#798776",
+      "color_5": "#839967",
+      "palette_name": "Nims Palette",
+      "project_id": 2
+    },
+    {
+      "color_1": "#488047",
+      "color_2": "#925578",
+      "color_3": "#319547",
+      "color_4": "#796876",
+      "color_5": "#834267",
+      "palette_name": "Lynnes Palette",
+      "project_id": 1
+    }
+  ],
+  "lynnardsToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJlbWFpbCI6Imx5bm5hcmRAbHlubmUuY29tIiwidXNlcl9uYW1lIjoibHlubmFyZCIsInBhc3N3b3JkIjoiJDJiJDEwJEhjejNiTHlDaDJkc2N4VVQ3VDlRaWVtSlZnUnZrbHZMRnNjZkVMb2xpSS5sM2pnYzEzeEtHIiwiY3JlYXRlZF9hdCI6IjIwMTktMDctMDdUMjM6MjI6MzAuMDE3WiIsInVwZGF0ZWRfYXQiOiIyMDE5LTA3LTA3VDIzOjIyOjMwLjAxN1oifSwiaWF0IjoxNTYyNTQ4OTEzfQ.T1cXhmZZg_oQOVknywt4cYomL0kjm4Vm9Vvx8T9Zz7U",
+  "nimsumsToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJlbWFpbCI6Im5pbXN1bUBuaW0uY29tIiwidXNlcl9uYW1lIjoibmltc3VtIiwicGFzc3dvcmQiOiIkMmIkMTAkY2tyOG1wano3MEozOUdUMktxNmpPLnhuY1NCcGouNWp5ZDdsclkvYjJjY0UuMjFYaFd5R1MiLCJjcmVhdGVkX2F0IjoiMjAxOS0wNy0wN1QyMzoyMjozMC4wMTdaIiwidXBkYXRlZF9hdCI6IjIwMTktMDctMDdUMjM6MjI6MzAuMDE3WiJ9LCJpYXQiOjE1NjI1NDg4NTd9.knRpgCNqH_9cV6UkMzMHMMZxA44-p4lRTlf3kMvFmFg"
+}
