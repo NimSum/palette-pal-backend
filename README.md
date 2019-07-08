@@ -52,7 +52,7 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   
   | `Authorization`| `Bearer <User Token Here>`| ##(Required for User validation for updating projects/palettes) 
   
-  - ### Login
+  - ### Signup
    #### Path: `/auth/signup`
    ##### Required Params:
   | Type         | value     | Description                             |
