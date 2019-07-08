@@ -12,9 +12,9 @@ exports.seed = function(knex) {
     .then(async () => {
       const promises = [];
       promises.push(
-        knex('users').insert(dummyData.users),
-        knex('projects').insert(dummyData.projects),
-        knex('palettes').insert(dummyData.palettes)
+        await knex('users').insert(dummyData.users),
+        await knex('projects').insert(dummyData.projects),
+        await knex('palettes').insert(dummyData.palettes)
       )
       return Promise.all(promises)
     })

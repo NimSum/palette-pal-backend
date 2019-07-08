@@ -17,23 +17,19 @@ app.listen(app.get('port'), () => {
 });
 
 app.get('/api/v1/projects', (req, res) => {
-  const { palettes, user_id } = req.query;
+  const { palettes } = req.query;
 
   if (palettes === 'included') {
     database.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id ORDER BY proj.updated_at `)
     .then(projects => {
-      const filtered = projects.rows.filter(proj => proj.user_id === parseInt(user_id));
-      res.status(200).json(filtered)
+      res.status(200).json(projects.rows)
     })
     .catch(error => res.status(500).json({ error }))
   } else {
     database('projects')
       .select()
       .then(projects => {
-        const filtered = user_id 
-          ? projects.filter(proj => proj.user_id === parseInt(user_id))
-          : projects;
-        res.status(200).json(filtered)
+        res.status(200).json(projects)
       })
       .catch(error => res.status(500).json({ error }))
   }
@@ -81,12 +77,13 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
   let { project_name } = req.body;
   let user_id = parseInt(req.query.user_id);
-  if (!project_name)
-    return res.status(422).send({
-      error: 'Required parameter project_name is missing'
-  });
-
+  
   if (res.auth.user.id === user_id) {
+    if (!project_name)
+      return res.status(422).send({
+        error: 'Required parameter "project_name" is missing'
+    });
+
     database('projects').insert({ project_name, user_id }, 'id')
     .then(projectId => res.status(201).json(projectId))
     .catch(error => res.status(500).json({ error }))
