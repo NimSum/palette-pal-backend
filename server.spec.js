@@ -113,47 +113,47 @@ describe('Server', () => {
 			expect(response.status).toBe(201);
 			expect(project.project_name).toEqual(newProject.project_name);
     });
-
-    it('should reject if user sends invalid token of user_id', async () => {
-			const newProject = { 
+    
+		it('should reject post if required param is invalid or not recieved', async () => {
+      const invalidBody = { invalidParam: '54321' };
+			const expectedError = {
+        error: 'Required parameter "project_name" is missing'
+			};
+      
+      const response = await request(app)
+      .post('/api/v1/projects?user_id=1')
+      .set({ authorization: dummyData.nimsumsToken })
+      .send(invalidBody)
+      
+      const responseNoParam = await request(app)
+      .post('/api/v1/projects?user_id=1')
+      .set({ authorization: dummyData.nimsumsToken })
+      
+      expect(response.status).toBe(422);
+			expect(responseNoParam.status).toBe(422);
+			expect(responseNoParam.body).toEqual(expectedError);
+    });
+    
+    it('should reject if user sends invalid token or bad user_id query', async () => {
+      const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
-
+  
       const invalidToken = await request(app)
         .post('/api/v1/projects?user_id=1')
         .set({ authorization: 'Bearer 12456' })
         .send(newProject)
       
       const invalidQueryId = await request(app)
-        .post('/api/v1/projects?user_id=1')
-        .set({ authorization: 'Bearer 12456' })
+        .post('/api/v1/projects?user_id=2')
+        .set({ authorization: dummyData.nimsumsToken })
         .send(newProject)
-
+  
       expect(invalidToken.status).toBe(403);
       expect(invalidQueryId.status).toBe(403);
-		});
-
-		it('should reject post if required param is invalid or not recieved', async () => {
-			const invalidBody = { invalidParam: '54321' };
-			const expectedError = {
-				error: 'Required parameter "project_name" is missing'
-			};
-      
-      const response = await request(app)
-        .post('/api/v1/projects?user_id=1')
-        .set({ authorization: dummyData.nimsumsToken })
-        .send(invalidBody)
-
-      const responseNoParam = await request(app)
-        .post('/api/v1/projects?user_id=1')
-        .set({ authorization: dummyData.nimsumsToken })
-      
-      expect(response.status).toBe(422);
-			expect(responseNoParam.status).toBe(422);
-			expect(responseNoParam.body).toEqual(expectedError);
-		});
+    });
 	});
-
+  
 	describe('POST /api/v1/palettes/', () => {
 		const newPalette = {
 			name: "Nimsum's Warm Palette",
@@ -198,7 +198,9 @@ describe('Server', () => {
 
 			expect(response.status).toBe(500);
 			expect(error).toEqual(expected);
-		});
+    });
+    
+   
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
