@@ -1,8 +1,6 @@
-import request from 'supertest';
-import app from './server';
-const environment = process.env.NODE_ENV || 'test';
-const configuration = require('./knexfile')[environment];
-const db = require('knex')(configuration);
+const request = require('supertest');
+const app =  require('./server');
+const db = require('./db');
 const dummyData = require('./db/seeds/seeds-data/dummyData.json')
 
 describe('Server', () => {
@@ -98,7 +96,7 @@ describe('Server', () => {
 	});
 
 	describe('POST /api/v1/projects/', () => {
-		it('should post a new project in projects db', async () => {
+		it('should post a new project in projects db if user has valid token', async () => {
 			const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
@@ -165,7 +163,7 @@ describe('Server', () => {
 			project_id: 1
 		};
 
-		it('should post a new palette in palettes db', async () => {
+		it('should post a new palette in palettes db if user has valid token', async () => {
       const response = await request(app)
         .post('/api/v1/palettes?user_id=1')
         .set({ authorization: dummyData.nimsumsToken })
@@ -298,7 +296,22 @@ describe('Server', () => {
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(expectedError);
-		});
+    });
+
+    it('should reject if token/user id is invalid', async () => {
+      const invalidId = -1;
+			const response = await request(app)
+      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken })
+
+			const expectedError = {
+				error: 'Failed to Delete: Palette does not exist'
+			};
+
+			expect(response.status).toBe(404);
+			expect(response.body).toEqual(expectedError);
+    });
+    
 	});
 
 	describe('PUT /api/v1/projects/:id', () => {
