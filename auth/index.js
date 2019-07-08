@@ -28,7 +28,7 @@ router.post('/signup', (req, res) => {
         }
       });
   } else {
-    res.status(403).json({ error: "Invalid user" })
+    res.status(403).json({ error: "Invalid params, user_name, email, password required" })
   }
 })
 
@@ -49,7 +49,7 @@ router.post('/login', (req, res) => {
                 }
                 jwt.sign({ user }, 'SECRETKEYGOESHERE', options, async (err, token) => {
                   if (err) res.sendStatus(500);
-                  res.json({
+                  res.status(200).json({
                     token,
                     user_id: user.id,
                     projects: await getUserData(user.id)
@@ -65,37 +65,15 @@ router.post('/login', (req, res) => {
 })
 
 function getUserData(userId) {
-  return database.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id ORDER BY proj.updated_at `)
+  return db.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id WHERE usr.id IN (${res.auth.user.id}) ORDER BY proj.updated_at`)
   .then(projects => {
-    return projects.rows.filter(proj => proj.user_id === parseInt(userId));
+    return projects.rows;
   })
 }
 
 async function addDefaultProject(userId) {
-  await database('projects')
+  await db('projects')
     .insert({ project_name: "Uncategorized", user_id: parseInt(userId) })
-}
-
-function verifyToken(req, res, next) {
-  // get auth header value
-  // TOKENT FORMAT:
-  // Authorization: Bearer <token> ?? maybe not??
-  const bearerHeader = req.headers.authorization;
-  if (bearerHeader !== undefined) {
-    const token = bearerHeader.split(' ')[1];
-    req.token = token;
-    // replace secret key with env var
-    jwt.verify(req.token, 'SECRETKEYGOESHERE', (err, authData) => {
-      if (err) {
-        res.sendStatus(403)
-      } else {
-        res.auth = authData;
-        next();
-      }
-    })
-  } else {
-    res.sendStatus(403);
-  }
 }
 
 function validateInputs(user) {
@@ -110,9 +88,9 @@ function validateInputs(user) {
 }
 
 function getUser(email) {
-  return database('users')
+  return db('users')
   .where({ email })
   .first();
 }
 
-module.exports = { router, verifyToken };
+module.exports = { router };
