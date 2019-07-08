@@ -302,7 +302,7 @@ describe('Server', () => {
 	});
 
 	describe('PUT /api/v1/projects/:id', () => {
-		const newName = { "project_name": "TEST USER 5" };
+		const newName = { "project_name": "NIMDIMSUM" };
 
 		it('should update the project name on valid requests', async () => {
 			const project = await db('projects').first();

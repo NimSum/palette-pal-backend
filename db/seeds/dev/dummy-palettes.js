@@ -1,5 +1,6 @@
 const dummyData = require('../seeds-data/dummyData.json');
 
+
 exports.seed = function(knex) {
   return knex('palettes').del()
     .then(() => knex('projects').del())

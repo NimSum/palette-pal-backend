@@ -56,7 +56,7 @@ router.post('/login', (req, res) => {
                 let options = {
                   expiresIn: '7d'
                 }
-                jwt.sign({ user }, process.env.SECRET_KEY, options, async (err, token) => {
+                jwt.sign({ user }, 'SECRETKEYGOESHERE', options, async (err, token) => {
                   if (err) res.sendStatus(500);
                   res.json({
                     token,
@@ -94,7 +94,7 @@ function verifyToken(req, res, next) {
     const token = bearerHeader.split(' ')[1];
     req.token = token;
     // replace secret key with env var
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+    jwt.verify(req.token, 'SECRETKEYGOESHERE', (err, authData) => {
       if (err) {
         res.sendStatus(403)
       } else {
