@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
-const environment = process.env.NODE_ENV || 'development';
 const bodyParser = require('body-parser');
-const configuration = require('./knexfile')[environment];
-const database = require('knex')(configuration);
+const db = require('./db');
 const cors = require('cors');
 const auth = require('./auth');
+const verifyToken = require('./middleware/verifyToken');
+const checkIfUserPalette = require('./middleware/checkUserPalettes');
+const checkIfUserProject = require('./middleware/checkUserProjects');
 
 app.use(bodyParser.json());
 app.use('/auth', auth.router);
@@ -16,30 +17,27 @@ app.listen(app.get('port'), () => {
   console.log(`App is running in port ${app.get('port')}`)
 });
 
-app.get('/api/v1/projects', (req, res) => {
+app.get('/api/v1/projects', verifyToken, (req, res) => {
   const { palettes } = req.query;
-
   if (palettes === 'included') {
-    database.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id ORDER BY proj.updated_at `)
+    db.raw(`SELECT usr.id AS user_id, proj.project_name, proj.id AS project_id, pal.palette_name, pal.id AS palette_id, pal.color_1, pal.color_2, pal.color_3, pal.color_4, pal.color_5 FROM palettes AS pal RIGHT JOIN projects AS proj ON pal.project_id = proj.id LEFT JOIN users AS usr ON usr.id = proj.user_id WHERE usr.id IN (${res.auth.user.id}) ORDER BY proj.updated_at`)
     .then(projects => {
       res.status(200).json(projects.rows)
     })
     .catch(error => res.status(500).json({ error }))
   } else {
-    database('projects')
+    db('projects')
       .select()
-      .then(projects => {
-        res.status(200).json(projects)
-      })
+      .then(projects => res.status(200).json(projects))
       .catch(error => res.status(500).json({ error }))
   }
 });
 
-app.get('/api/v1/projects/:id', (req, res) => {
-  database('projects')
+app.get('/api/v1/projects/:id', verifyToken, (req, res) => {
+  db('projects')
     .where({ id: req.params.id })
     .then(project => {
-      if (!project.length) {
+      if (!project.length || project[0].user_id !== res.auth.user.id) {
         res.status(404).json({ 
           error: 'Requested id does not correspond to any projects' 
         })
@@ -55,12 +53,12 @@ app.get('/api/v1/palettes', (req, res) => {
   const { project_id } = req.query;
 
   if (project_id) {
-    database('palettes')
+    db('palettes')
       .where({ project_id })
       .then(palettes => res.status(200).json(palettes))
       .catch(error => res.status(500).json({ error }))
   } else {
-    database('palettes')
+    db('palettes')
       .select()
       .then(palettes => res.status(200).json(palettes))
       .catch(error => res.status(500).json({ error }))
@@ -68,7 +66,7 @@ app.get('/api/v1/palettes', (req, res) => {
 });
 
 app.get('/api/v1/palettes/:id', (req, res) => {
-  database('palettes')
+  db('palettes')
     .where({ id: req.params.id })
     .then(palette => {
       if (!palette.length) {
@@ -83,7 +81,7 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .catch(error => res.status(500).json({ error }));
 })
 
-app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
+app.post('/api/v1/projects', verifyToken, (req, res) => {
   let { project_name } = req.body;
   let user_id = parseInt(req.query.user_id);
   
@@ -93,7 +91,7 @@ app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
         error: 'Required parameter "project_name" is missing'
     });
 
-    database('projects').insert({ project_name, user_id }, 'id')
+    db('projects').insert({ project_name, user_id }, 'id')
     .then(projectId => res.status(201).json(projectId))
     .catch(error => res.status(500).json({ error }))
   } else {
@@ -101,7 +99,7 @@ app.post('/api/v1/projects', auth.verifyToken, (req, res) => {
   }
 });
 
-app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
+app.post('/api/v1/palettes', verifyToken, (req, res) => {
   let newPalette = req.body;
   let user_id = parseInt(req.query.user_id);
 
@@ -124,7 +122,7 @@ app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
       }
     }
 
-    database('palettes').insert(newPalette, 'id')
+    db('palettes').insert(newPalette, 'id')
     .then(paletteId => res.status(201).json(paletteId))
     .catch(error => res.status(500).json({ error }))
   } else {
@@ -132,12 +130,10 @@ app.post('/api/v1/palettes', auth.verifyToken, (req, res) => {
   }
 })
 
-app.delete('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
+app.delete('/api/v1/projects/:id', verifyToken, checkIfUserProject, (req, res) => {
   const { id } = req.params;
-  const user_id = parseInt(req.query.user_id);
 
-  if (res.auth.user.id === user_id) {
-    database('projects')
+    db('projects')
     .where({ id })
     .del()
     .then((delCount) => {
@@ -148,61 +144,46 @@ app.delete('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
       } else res.sendStatus(202);
     })
     .catch(error => res.status(500).json({ error }))
-  } else {
-    res.sendStatus(403);
-  }
 })
 
-app.delete('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
+app.delete('/api/v1/palettes/:id', verifyToken, checkIfUserPalette, (req, res) => {
   const { id } = req.params;
-  const user_id = parseInt(req.query.user_id);
 
-  if (res.auth.user.id === user_id) {
-    database('palettes')
-    .where({ id })
-    .del()
-    .then((delCount) => {
-      if (!delCount) {
-        res.status(404).json({ 
-          error: 'Failed to Delete: Palette does not exist' 
-        }) 
-      } else res.sendStatus(202);
-    })
-    .catch(error => res.status(500).json({ error }))
-  } else {
-    res.sendStatus(403);
-  }
+  db('palettes')
+  .where({ id })
+  .del()
+  .then((delCount) => {
+    if (!delCount) {
+      res.status(404).json({ 
+        error: 'Failed to Delete: Palette does not exist' 
+      }) 
+    } else res.sendStatus(202);
+  })
+  .catch(error => res.status(500).json({ error }))
 })
 
-app.put('/api/v1/projects/:id', auth.verifyToken, (req, res) => {
+app.put('/api/v1/projects/:id', verifyToken, checkIfUserProject, (req, res) => {
   const { id } = req.params;
-  const user_id = parseInt(req.query.user_id);
   const { project_name } = req.body;
 
-  if (res.auth.user.id === user_id) {
-    database('projects')
-    .where({ id })
-    .update({ project_name }, ['id'])
-    .then((id) => {
-      if (!id.length) {
-        res.status(404).json({ 
-          error: 'Failed to update: Project does not exist' 
-        });
-      } else res.sendStatus(202);
-    })
-    .catch(error => res.status(500).json({ error }))  
-  } else {
-    res.sendStatus(403);
-  }
+  db('projects')
+  .where({ id })
+  .update({ project_name }, ['id'])
+  .then((id) => {
+    if (!id.length) {
+      res.status(404).json({ 
+        error: 'Failed to update: Project does not exist' 
+      });
+    } else res.sendStatus(202);
+  })
+  .catch(error => res.status(500).json({ error }))  
 })
 
-app.put('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
+app.put('/api/v1/palettes/:id', verifyToken, checkIfUserPalette, (req, res) => {
   const { id } = req.params;
-  const user_id = parseInt(req.query.user_id);
   const updatedPalette = req.body;
 
-  if (res.auth.user.id === user_id) {
-    database('palettes')
+    db('palettes')
     .where({ id })
     .update({ ...updatedPalette }, ['id'])
     .then((id) => {
@@ -212,11 +193,6 @@ app.put('/api/v1/palettes/:id', auth.verifyToken, (req, res) => {
         });
       } else res.sendStatus(202);
     })
-    .catch(error => res.status(500).json({ error }))  
-  } else {
-    res.sendStatus(403);
-  }
 })
-
 
 module.exports = app;
