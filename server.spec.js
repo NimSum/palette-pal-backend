@@ -319,7 +319,7 @@ describe('Server', () => {
 			expect(updated.name).toEqual(newName.name);
 		});
 
-		it.skip('should respond with an error for invalid project id', async () => {
+		it('should respond with an error for invalid project id', async () => {
 			const error = {
 				error: 'Failed to update: Project does not exist'
 			};
@@ -339,14 +339,17 @@ describe('Server', () => {
 		const updatedPalette = {
 			color_1: '#000000',
 			color_4: '#001100',
-			name: 'NEW UPDATED'
+			palette_name: 'NEW UPDATED'
 		};
 
-		it.skip('should update the palette props on valid requests', async () => {
+		it('should update the palette props on valid requests', async () => {
 			const palette = await db('palettes').first();
 			const paletteToUpdate = palette.id;
 
-			const response = await request(app).put(`/api/v1/palettes/${paletteToUpdate}`).send(updatedPalette);
+			const response = await request(app)
+        .put(`/api/v1/palettes/${paletteToUpdate}?user_id=1`)
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(updatedPalette)
 
 			const updated = await db('palettes').where({ id: paletteToUpdate }).first();
 
@@ -356,12 +359,16 @@ describe('Server', () => {
 			expect(updated.name).toEqual(updatedPalette.name);
 		});
 
-		it.skip('should respond with an error for invalid palette id', async () => {
+		it('should respond with an error for invalid palette id', async () => {
 			const error = {
 				error: 'Failed to update: Palette does not exist'
-			};
+      };
+      const invalidId = -1;
 
-			const response = await request(app).put('/api/v1/palettes/-1').send(updatedPalette);
+			const response = await request(app)
+        .put(`/api/v1/palettes/${invalidId}?user_id=1`)
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(updatedPalette)
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
