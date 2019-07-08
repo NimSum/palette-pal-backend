@@ -48,7 +48,7 @@ describe('Server', () => {
 			const response = await request(app).get(`/api/v1/projects/${id}`);
 			const result = response.body;
 
-			expect(result.name).toEqual(expectedProject.name);
+			expect(result.project_name).toEqual(expectedProject.project_name);
 		});
 
 		it('should respond with an error if no project with requested id', async () => {
@@ -82,7 +82,7 @@ describe('Server', () => {
 			const response = await request(app).get(`/api/v1/palettes/${id}`);
 			const result = response.body;
 
-			expect(result.name).toEqual(expectedPalette.name);
+			expect(result.palette_name).toEqual(expectedPalette.palette_name);
 		});
 
 		it('should respond with an error if no palette with requested id', async () => {
@@ -175,7 +175,7 @@ describe('Server', () => {
 			const palette = await db('palettes').where({ id }).first();
 
 			expect(response.status).toBe(201);
-			expect(palette.name).toEqual(newPalette.name);
+			expect(palette.palette_name).toEqual(newPalette.palette_name);
 		});
 
 		it('should reject post if required param is invalid or not recieved', async () => {
@@ -302,7 +302,7 @@ describe('Server', () => {
 	});
 
 	describe('PUT /api/v1/projects/:id', () => {
-		const newName = { "project_name": "NIMDIMSUM" };
+		const newName = { project_name: 'NIMDIMSUM' };
 
 		it('should update the project name on valid requests', async () => {
 			const project = await db('projects').first();
@@ -316,7 +316,7 @@ describe('Server', () => {
       const updated = await db('projects').where({ id: projectToUpdate }).first();
       
 			expect(response.status).toBe(202);
-			expect(updated.name).toEqual(newName.name);
+			expect(updated.project_name).toEqual(newName.project_name);
 		});
 
 		it('should respond with an error for invalid project id', async () => {
@@ -356,7 +356,7 @@ describe('Server', () => {
 			expect(response.status).toBe(202);
 			expect(updated.color_1).toEqual(updatedPalette.color_1);
 			expect(updated.color_4).toEqual(updatedPalette.color_4);
-			expect(updated.name).toEqual(updatedPalette.name);
+			expect(updated.palette_name).toEqual(updatedPalette.palette_name);
 		});
 
 		it('should respond with an error for invalid palette id', async () => {
