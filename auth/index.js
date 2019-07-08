@@ -3,16 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('../knexfile')[environment];
-const database = require('knex')(configuration);
-
-// Route paths are prepended with /auth
-router.get('/', (req, res) => {
-  res.json({
-    message: '🔐'
-  })
-})
+const db = require('../db');
 
 router.post('/signup', (req, res) => {
   const { email, password, user_name } = req.body;
@@ -25,7 +16,7 @@ router.post('/signup', (req, res) => {
         if (!user) {
           bcrypt.hash(password, 10)
             .then(hash => {
-              database('users')
+              db('users')
                 .insert({ email, password: hash, user_name }, 'id')
                 .then(user_id => {
                   addDefaultProject(user_id)
