@@ -156,7 +156,7 @@ describe('Server', () => {
   
 	describe('POST /api/v1/palettes/', () => {
 		const newPalette = {
-			name: "Nimsum's Warm Palette",
+			palette_name: "Nimsum's Warm Palette",
 			color_1: '#000000',
 			color_2: '#000000',
 			color_3: '#000000',
@@ -165,8 +165,11 @@ describe('Server', () => {
 			project_id: 1
 		};
 
-		it.skip('should post a new palette in palettes db', async () => {
-			const response = await request(app).post('/api/v1/palettes').send(newPalette);
+		it('should post a new palette in palettes db', async () => {
+      const response = await request(app)
+        .post('/api/v1/palettes?user_id=1')
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(newPalette)
 			const id = parseInt(response.body);
 
 			const palette = await db('palettes').where({ id }).first();
@@ -175,24 +178,31 @@ describe('Server', () => {
 			expect(palette.name).toEqual(newPalette.name);
 		});
 
-		it.skip('should reject post if required param is invalid or not recieved', async () => {
+		it('should reject post if required param is invalid or not recieved', async () => {
 			newPalette.project_id = null;
 
-			const response = await request(app).post('/api/v1/palettes').send(newPalette);
+			const response = await request(app)
+        .post('/api/v1/palettes?user_id=1')
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(newPalette)
 
 			const expected = {
 				error:
-					'Expected parameters of: name, project_id, color_1, color_2, color_3, color_4, color_5. Missing: project_id'
+					'Expected parameters of: palette_name, project_id, color_1, color_2, color_3, color_4, color_5. Missing: project_id'
 			};
 
 			expect(response.status).toBe(422);
 			expect(response.body).toEqual(expected);
 		});
 
-		it.skip('should reject post if project reference id does not match any projects in db', async () => {
+		it('should reject post if project reference id does not match any projects in db', async () => {
 			newPalette.project_id = -1;
 
-			const response = await request(app).post('/api/v1/palettes').send(newPalette);
+			const response = await request(app)
+        .post('/api/v1/palettes?user_id=1')
+        .set({ authorization: dummyData.nimsumsToken })
+        .send(newPalette);
+
 			const error = response.body.error.detail;
 			const expected = 'Key (project_id)=(-1) is not present in table "projects".';
 
@@ -217,51 +227,70 @@ describe('Server', () => {
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
-		it.skip('should delete projects using the id param', async () => {
+		it('should delete projects using the id param', async () => {
 			const project = await db('projects').first();
-			const projectToDelete = project.id;
+      const projectToDelete = project.id;
+      
+      const response = await request(app)
+      .delete(`/api/v1/projects/${projectToDelete}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken })
 
-			const response = await request(app).delete(`/api/v1/projects/${projectToDelete}`);
 			const deleted = await db('projects').where({ id: projectToDelete });
 
 			expect(response.status).toBe(202);
 			expect(deleted).toEqual([]);
     });
     
-    it.skip('should delete all palettes associated with a project when a project is deleted', async () => {
+    it('should delete all palettes associated with a project when a project is deleted', async () => {
       const project = await db('projects').first();
       const projectID = project.id;
 
-      const response = await request(app).delete(`/api/v1/projects/${projectID}`);
+      const response = await request(app)
+      .delete(`/api/v1/projects/${projectID}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken })
+
       const deleted = await db('palettes').where({ project_id: projectID });
 
+      expect(response.status).toBe(202);
       expect(deleted).toEqual([]);
     });
 
-		it.skip('should respond with an error if id param is not in the projects db', async () => {
-			const response = await request(app).delete('/api/v1/projects/-1');
+		it('should respond with an error if id param is not in the projects db', async () => {
+      const invalideId = -1;
+
+			const response = await request(app)
+      .delete(`/api/v1/projects/${invalideId}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken });
+
 			const expectedError = {
 				error: 'Failed to Delete: Project does not exist'
-			};
+      };
+      
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(expectedError);
 		});
 	});
 
 	describe('DELETE /api/v1/palettes/:id', () => {
-		it.skip('should delete palettes using the id param', async () => {
+		it('should delete palettes using the id param', async () => {
 			const palette = await db('palettes').first();
 			const paletteToDelete = palette.id;
 
-			const response = await request(app).delete(`/api/v1/palettes/${paletteToDelete}`);
+			const response = await request(app)
+      .delete(`/api/v1/palettes/${paletteToDelete}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken })
+
 			const deleted = await db('palettes').where({ id: paletteToDelete });
 
 			expect(response.status).toBe(202);
 			expect(deleted).toEqual([]);
 		});
 
-		it.skip('should respond with an error if id param is not in the palettes db', async () => {
-			const response = await request(app).delete('/api/v1/palettes/-1');
+		it('should respond with an error if id param is not in the palettes db', async () => {
+      const invalidId = -1;
+			const response = await request(app)
+      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
+      .set({ authorization: dummyData.nimsumsToken })
 
 			const expectedError = {
 				error: 'Failed to Delete: Palette does not exist'
@@ -273,16 +302,19 @@ describe('Server', () => {
 	});
 
 	describe('PUT /api/v1/projects/:id', () => {
-		const newName = { name: 'NIMDIMSUM' };
+		const newName = { "project_name": "TEST USER 5" };
 
-		it.skip('should update the project name on valid requests', async () => {
+		it('should update the project name on valid requests', async () => {
 			const project = await db('projects').first();
-			const projectToUpdate = project.id;
+      const projectToUpdate = project.id;
+      
+      const response = await request(app)
+        .put(`/api/v1/projects/${projectToUpdate}?user_id=2`)
+        .set({ authorization: dummyData.lynnardsToken })
+        .send(newName)
 
-			const response = await request(app).put(`/api/v1/projects/${projectToUpdate}`).send(newName);
-
-			const updated = await db('projects').where({ id: projectToUpdate }).first();
-
+      const updated = await db('projects').where({ id: projectToUpdate }).first();
+      
 			expect(response.status).toBe(202);
 			expect(updated.name).toEqual(newName.name);
 		});
@@ -291,8 +323,12 @@ describe('Server', () => {
 			const error = {
 				error: 'Failed to update: Project does not exist'
 			};
-
-			const response = await request(app).put('/api/v1/projects/-1').send(newName);
+      const invalidId = -1;
+      
+      const response = await request(app)
+        .put(`/api/v1/projects/${invalidId}?user_id=2`)
+        .set({ authorization: dummyData.lynnardsToken })
+        .send(newName)
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
