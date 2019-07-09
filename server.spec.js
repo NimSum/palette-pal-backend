@@ -316,7 +316,7 @@ describe('Server', () => {
 	describe('PUT /api/v1/projects/:id', () => {
 		const newName = { project_name: 'NIMDIMSUM' };
 
-		fit('should update the project name on valid requests', async () => {
+		it('should update the project name on valid requests', async () => {
 			const nimsProject = await db('projects').where({ id: 2 }).first();
       const projectToUpdate = nimsProject.id;
       
@@ -331,14 +331,14 @@ describe('Server', () => {
 			expect(updated.project_name).toEqual(newName.project_name);
 		});
 
-		it('should respond with an error for invalid project id', async () => {
+		fit('should respond with an error for invalid project id', async () => {
 			const error = {
-				error: 'Failed to update: Project does not exist'
+				error: 'Not a user project or invalid id'
 			};
       const invalidId = -1;
       
       const response = await request(app)
-        .put(`/api/v1/projects/${invalidId}?user_id=2`)
+        .put(`/api/v1/projects/${invalidId}`)
         .set({ authorization: dummyData.lynnardsToken })
         .send(newName)
 
