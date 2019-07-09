@@ -149,7 +149,7 @@ describe('Server', () => {
 			expect(responseNoParam.body).toEqual(expectedError);
     });
     
-    fit('should reject if user sends invalid token or bad user_id query', async () => {
+    it('should reject if user sends invalid token or bad user_id query', async () => {
       const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
@@ -219,19 +219,13 @@ describe('Server', () => {
 			expect(error).toEqual(expected);
     });
     
-    it('should reject if user sends invalid token bad user_id query', async () => {
+    fit('should reject if user sends invalid token', async () => {
       const invalidToken = await request(app)
         .post('/api/v1/palettes?user_id=1')
         .set({ authorization: 'Bearer 12456' })
         .send(newPalette)
       
-      const invalidQueryId = await request(app)
-        .post('/api/v1/palettes?user_id=2')
-        .set({ authorization: dummyData.nimsumsToken })
-        .send(newPalette)
-  
       expect(invalidToken.status).toBe(403);
-      expect(invalidQueryId.status).toBe(403);
     });
 	});
 
