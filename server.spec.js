@@ -17,13 +17,14 @@ describe('Server', () => {
 	});
 
 	describe('GET /api/v1/projects', () => {
-		fit('should return all projects in the db project table if they exist', async () => {
+		it('should return all projects in the db project table if they exist', async () => {
       const nimsProjects = await db('projects')
         .where({ id: 2 })
 
-        const response = await request(app)
-        .get('/api/v1/projects')
-        .set({ authorization: dummyData.nimsumsToken })
+      const response = await request(app)
+      .get('/api/v1/projects')
+      .set({ authorization: dummyData.nimsumsToken })
+
       const converted = convertDate(nimsProjects);
 			const result = response.body;
 
@@ -33,9 +34,12 @@ describe('Server', () => {
     it('should return projects with palettes included if query string is set to included', async () => {
 
       const response = await request(app)
-        .get('/api/v1/projects?palettes=included');
+      .get('/api/v1/projects?palettes=included')
+      .set({ authorization: dummyData.nimsumsToken })
+        
       const result = response.body[0];
 
+      expect(result).toHaveProperty('project_name');
       expect(result).toHaveProperty('color_1');
 			expect(result).toHaveProperty('color_3');
 			expect(result).toHaveProperty('color_5');      
