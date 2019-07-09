@@ -219,7 +219,7 @@ describe('Server', () => {
 			expect(error).toEqual(expected);
     });
     
-    fit('should reject if user sends invalid token', async () => {
+    it('should reject if user sends invalid token', async () => {
       const invalidToken = await request(app)
         .post('/api/v1/palettes?user_id=1')
         .set({ authorization: 'Bearer 12456' })
@@ -230,18 +230,17 @@ describe('Server', () => {
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
-		it('should delete projects using the id param', async () => {
-			const project = await db('projects').first();
-      const projectToDelete = project.id;
-      
+		fit('should delete projects using the id param', async () => {
+			const lynnesProject = await db('projects').where({ id: 1 }).first();
+      const projectToDelete = lynnesProject.id;
       const response = await request(app)
-      .delete(`/api/v1/projects/${projectToDelete}?user_id=1`)
-      .set({ authorization: dummyData.nimsumsToken })
+      .delete(`/api/v1/projects/${projectToDelete}`)
+      .set({ authorization: dummyData.lynnardsToken })
 
-			const deleted = await db('projects').where({ id: projectToDelete });
+      const deletedProject = await db('projects').where({ id: 1 });
 
-			expect(response.status).toBe(202);
-			expect(deleted).toEqual([]);
+      expect(response.status).toBe(202);
+      expect(deletedProject).toEqual([]);
     });
     
     it('should delete all palettes associated with a project when a project is deleted', async () => {
