@@ -230,7 +230,7 @@ describe('Server', () => {
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
-		fit('should delete projects using the id param', async () => {
+		it('should delete projects using the id param', async () => {
 			const lynnesProject = await db('projects').where({ id: 1 }).first();
       const projectToDelete = lynnesProject.id;
       const response = await request(app)
@@ -243,12 +243,12 @@ describe('Server', () => {
       expect(deletedProject).toEqual([]);
     });
     
-    it('should delete all palettes associated with a project when a project is deleted', async () => {
-      const project = await db('projects').first();
-      const projectID = project.id;
+    fit('should delete all palettes associated with a project when a project is deleted', async () => {
+      const nimsProject = await db('projects').where({ id: 2 }).first();
+      const projectID = nimsProject.id;
 
       const response = await request(app)
-      .delete(`/api/v1/projects/${projectID}?user_id=1`)
+      .delete(`/api/v1/projects/${projectID}`)
       .set({ authorization: dummyData.nimsumsToken })
 
       const deleted = await db('palettes').where({ project_id: projectID });
