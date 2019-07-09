@@ -17,13 +17,17 @@ describe('Server', () => {
 	});
 
 	describe('GET /api/v1/projects', () => {
-		it('should return all projects in the db project table if they exist', async () => {
-			const expectedProjects = await db('projects').select().then(proj => convertDate(proj));
+		fit('should return all projects in the db project table if they exist', async () => {
+      const nimsProjects = await db('projects')
+        .where({ id: 2 })
 
-			const response = await request(app).get('/api/v1/projects');
+        const response = await request(app)
+        .get('/api/v1/projects')
+        .set({ authorization: dummyData.nimsumsToken })
+      const converted = convertDate(nimsProjects);
 			const result = response.body;
 
-			expect(result).toEqual(expectedProjects);
+			expect(result).toEqual(converted);
     });
     
     it('should return projects with palettes included if query string is set to included', async () => {
