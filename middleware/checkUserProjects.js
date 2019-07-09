@@ -6,7 +6,6 @@ function checkIfUserProject(req, res, next) {
 
   db.raw(selectProjects)
     .then(result => {
-      console.log(result)
       const userIsOwner = result.rows.some(proj => proj.project_id === parseInt(req.params.id));
       if (userIsOwner) {
         next();
