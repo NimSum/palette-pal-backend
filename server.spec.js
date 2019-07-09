@@ -44,6 +44,14 @@ describe('Server', () => {
 			expect(result).toHaveProperty('color_3');
 			expect(result).toHaveProperty('color_5');      
     })
+
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .get(`/api/v1/projects/`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('GET /api/v1/projects/:id', () => {
@@ -75,7 +83,15 @@ describe('Server', () => {
 			};
 			expect(result).toEqual(expected);
 			expect(response.status).toBe(404);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .get(`/api/v1/projects/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('GET /api/v1/palettes', () => {
@@ -149,14 +165,14 @@ describe('Server', () => {
 			expect(responseNoParam.body).toEqual(expectedError);
     });
     
-    it('should reject if user sends invalid token or bad user_id query', async () => {
+    it('should reject if user sends invalid token', async () => {
       const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
   
       const invalidToken = await request(app)
         .post('/api/v1/projects')
-        .set({ authorization: 'Bearer 11' })
+        .set({ authorization: 'Bearer INVALID TOKEN' })
         .send(newProject)
   
       expect(invalidToken.status).toBe(403);
@@ -344,7 +360,15 @@ describe('Server', () => {
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .put(`/api/v1/projects/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('PUT /api/v1/palettes/:id', () => {
@@ -384,6 +408,14 @@ describe('Server', () => {
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .put(`/api/v1/palettes/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 });
