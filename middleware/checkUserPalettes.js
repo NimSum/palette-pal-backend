@@ -10,7 +10,7 @@ function checkIfUserPalette(req, res, next) {
       if (userIsOwner) {
         next();
       } else {
-        res.status(403).json({ error: "Not a user palette"})
+        res.status(404).json({ error: "Not a user palette"})
       }
     });
 }

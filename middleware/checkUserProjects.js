@@ -10,7 +10,7 @@ function checkIfUserProject(req, res, next) {
       if (userIsOwner) {
         next();
       } else {
-        res.status(403).json({ error: "Not a user project"})
+        res.status(404).json({ error: "Not a user project or invalid id"})
       }
     });
 }

@@ -243,7 +243,7 @@ describe('Server', () => {
       expect(deletedProject).toEqual([]);
     });
     
-    fit('should delete all palettes associated with a project when a project is deleted', async () => {
+    it('should delete all palettes associated with a project when a project is deleted', async () => {
       const nimsProject = await db('projects').where({ id: 2 }).first();
       const projectID = nimsProject.id;
 
@@ -257,15 +257,15 @@ describe('Server', () => {
       expect(deleted).toEqual([]);
     });
 
-		it('should respond with an error if id param is not in the projects db', async () => {
+		fit('should respond with an error if id param is not in the projects db', async () => {
       const invalideId = -1;
 
 			const response = await request(app)
-      .delete(`/api/v1/projects/${invalideId}?user_id=1`)
+      .delete(`/api/v1/projects/${invalideId}`)
       .set({ authorization: dummyData.nimsumsToken });
 
 			const expectedError = {
-				error: 'Failed to Delete: Project does not exist'
+				error: 'Not a user project or invalid id'
       };
       
 			expect(response.status).toBe(404);
