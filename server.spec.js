@@ -61,7 +61,7 @@ describe('Server', () => {
 			expect(result.project_name).toEqual(expectedProject.project_name);
 		});
 
-		fit('should respond with an error if no project with requested id', async () => {
+		it('should respond with an error if no project with requested id', async () => {
       const invalidID = -1;
 
 			const response = await request(app)
@@ -149,23 +149,17 @@ describe('Server', () => {
 			expect(responseNoParam.body).toEqual(expectedError);
     });
     
-    it('should reject if user sends invalid token or bad user_id query', async () => {
+    fit('should reject if user sends invalid token or bad user_id query', async () => {
       const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
   
       const invalidToken = await request(app)
-        .post('/api/v1/projects?user_id=1')
-        .set({ authorization: 'Bearer 12456' })
-        .send(newProject)
-      
-      const invalidQueryId = await request(app)
-        .post('/api/v1/projects?user_id=2')
-        .set({ authorization: dummyData.nimsumsToken })
+        .post('/api/v1/projects')
+        .set({ authorization: 'Bearer 11' })
         .send(newProject)
   
       expect(invalidToken.status).toBe(403);
-      expect(invalidQueryId.status).toBe(403);
     });
 	});
   
