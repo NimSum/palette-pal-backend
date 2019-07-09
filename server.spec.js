@@ -47,7 +47,7 @@ describe('Server', () => {
 	});
 
 	describe('GET /api/v1/projects/:id', () => {
-		fit('should return a specific project with the id in the endpoint', async () => {
+		it('should return a specific project with the id in the endpoint', async () => {
       const expectedProject = await db('projects').where({ id: 1 })
 
 			const id = expectedProject.id;
@@ -61,8 +61,13 @@ describe('Server', () => {
 			expect(result.project_name).toEqual(expectedProject.project_name);
 		});
 
-		it('should respond with an error if no project with requested id', async () => {
-			const response = await request(app).get('/api/v1/projects/-1');
+		fit('should respond with an error if no project with requested id', async () => {
+      const invalidID = -1;
+
+			const response = await request(app)
+      .get(`/api/v1/projects/${invalidID}`)
+      .set({ authorization: dummyData.lynnardsToken })
+
 			const result = response.body;
 
 			const expected = {
