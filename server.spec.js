@@ -257,7 +257,7 @@ describe('Server', () => {
       expect(deleted).toEqual([]);
     });
 
-		fit('should respond with an error if id param is not in the projects db', async () => {
+		it('should respond with an error if id param is not in the projects db', async () => {
       const invalideId = -1;
 
 			const response = await request(app)
@@ -290,30 +290,25 @@ describe('Server', () => {
 
 		it('should respond with an error if id param is not in the palettes db', async () => {
       const invalidId = -1;
+
 			const response = await request(app)
-      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
+      .delete(`/api/v1/palettes/${invalidId}`)
       .set({ authorization: dummyData.nimsumsToken })
 
 			const expectedError = {
-				error: 'Failed to Delete: Palette does not exist'
+				error: 'Not a user palette or invalid id'
 			};
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(expectedError);
     });
 
-    it('should reject if token/user id is invalid', async () => {
-      const invalidId = -1;
+    it('should reject if token is invalid', async () => {
 			const response = await request(app)
-      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
-      .set({ authorization: dummyData.nimsumsToken })
+      .delete(`/api/v1/palettes/1`)
+      .set({ authorization: "Not Valid" })
 
-			const expectedError = {
-				error: 'Failed to Delete: Palette does not exist'
-			};
-
-			expect(response.status).toBe(404);
-			expect(response.body).toEqual(expectedError);
+			expect(response.status).toBe(403);
     });
     
 	});
@@ -322,11 +317,11 @@ describe('Server', () => {
 		const newName = { project_name: 'NIMDIMSUM' };
 
 		it('should update the project name on valid requests', async () => {
-			const project = await db('projects').first();
+			const project = await db('projects').where({ id: 1 });
       const projectToUpdate = project.id;
       
       const response = await request(app)
-        .put(`/api/v1/projects/${projectToUpdate}?user_id=2`)
+        .put(`/api/v1/projects/${projectToUpdate}?`)
         .set({ authorization: dummyData.lynnardsToken })
         .send(newName)
 
