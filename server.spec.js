@@ -18,39 +18,64 @@ describe('Server', () => {
 
 	describe('GET /api/v1/projects', () => {
 		it('should return all projects in the db project table if they exist', async () => {
-			const expectedProjects = await db('projects').select().then(proj => convertDate(proj));
+      const nimsProjects = await db('projects')
+        .where({ id: 2 })
 
-			const response = await request(app).get('/api/v1/projects');
+      const response = await request(app)
+      .get('/api/v1/projects')
+      .set({ authorization: dummyData.nimsumsToken })
+
+      const converted = convertDate(nimsProjects);
 			const result = response.body;
 
-			expect(result).toEqual(expectedProjects);
+			expect(result).toEqual(converted);
     });
     
     it('should return projects with palettes included if query string is set to included', async () => {
 
       const response = await request(app)
-        .get('/api/v1/projects?palettes=included');
+      .get('/api/v1/projects?palettes=included')
+      .set({ authorization: dummyData.nimsumsToken })
+        
       const result = response.body[0];
 
+      expect(result).toHaveProperty('project_name');
       expect(result).toHaveProperty('color_1');
 			expect(result).toHaveProperty('color_3');
 			expect(result).toHaveProperty('color_5');      
     })
+
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .get(`/api/v1/projects/`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('GET /api/v1/projects/:id', () => {
 		it('should return a specific project with the id in the endpoint', async () => {
-			const expectedProject = await db('projects').first();
-			const id = expectedProject.id;
+      const expectedProject = await db('projects').where({ id: 1 })
 
-			const response = await request(app).get(`/api/v1/projects/${id}`);
+			const id = expectedProject.id;
+      
+      const response = await request(app)
+      .get(`/api/v1/projects/${id}`)
+      .set({ authorization: dummyData.lynnardsToken })
+
 			const result = response.body;
 
 			expect(result.project_name).toEqual(expectedProject.project_name);
 		});
 
 		it('should respond with an error if no project with requested id', async () => {
-			const response = await request(app).get('/api/v1/projects/-1');
+      const invalidID = -1;
+
+			const response = await request(app)
+      .get(`/api/v1/projects/${invalidID}`)
+      .set({ authorization: dummyData.lynnardsToken })
+
 			const result = response.body;
 
 			const expected = {
@@ -58,7 +83,15 @@ describe('Server', () => {
 			};
 			expect(result).toEqual(expected);
 			expect(response.status).toBe(404);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .get(`/api/v1/projects/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('GET /api/v1/palettes', () => {
@@ -132,23 +165,17 @@ describe('Server', () => {
 			expect(responseNoParam.body).toEqual(expectedError);
     });
     
-    it('should reject if user sends invalid token or bad user_id query', async () => {
+    it('should reject if user sends invalid token', async () => {
       const newProject = { 
         project_name: "Nimsum's Portfolio"
       };
   
       const invalidToken = await request(app)
-        .post('/api/v1/projects?user_id=1')
-        .set({ authorization: 'Bearer 12456' })
-        .send(newProject)
-      
-      const invalidQueryId = await request(app)
-        .post('/api/v1/projects?user_id=2')
-        .set({ authorization: dummyData.nimsumsToken })
+        .post('/api/v1/projects')
+        .set({ authorization: 'Bearer INVALID TOKEN' })
         .send(newProject)
   
       expect(invalidToken.status).toBe(403);
-      expect(invalidQueryId.status).toBe(403);
     });
 	});
   
@@ -208,43 +235,36 @@ describe('Server', () => {
 			expect(error).toEqual(expected);
     });
     
-    it('should reject if user sends invalid token bad user_id query', async () => {
+    it('should reject if user sends invalid token', async () => {
       const invalidToken = await request(app)
         .post('/api/v1/palettes?user_id=1')
         .set({ authorization: 'Bearer 12456' })
         .send(newPalette)
       
-      const invalidQueryId = await request(app)
-        .post('/api/v1/palettes?user_id=2')
-        .set({ authorization: dummyData.nimsumsToken })
-        .send(newPalette)
-  
       expect(invalidToken.status).toBe(403);
-      expect(invalidQueryId.status).toBe(403);
     });
 	});
 
 	describe('DELETE /api/v1/projects/:id', () => {
 		it('should delete projects using the id param', async () => {
-			const project = await db('projects').first();
-      const projectToDelete = project.id;
-      
+			const lynnesProject = await db('projects').where({ id: 1 }).first();
+      const projectToDelete = lynnesProject.id;
       const response = await request(app)
-      .delete(`/api/v1/projects/${projectToDelete}?user_id=1`)
-      .set({ authorization: dummyData.nimsumsToken })
+      .delete(`/api/v1/projects/${projectToDelete}`)
+      .set({ authorization: dummyData.lynnardsToken })
 
-			const deleted = await db('projects').where({ id: projectToDelete });
+      const deletedProject = await db('projects').where({ id: 1 });
 
-			expect(response.status).toBe(202);
-			expect(deleted).toEqual([]);
+      expect(response.status).toBe(202);
+      expect(deletedProject).toEqual([]);
     });
     
     it('should delete all palettes associated with a project when a project is deleted', async () => {
-      const project = await db('projects').first();
-      const projectID = project.id;
+      const nimsProject = await db('projects').where({ id: 2 }).first();
+      const projectID = nimsProject.id;
 
       const response = await request(app)
-      .delete(`/api/v1/projects/${projectID}?user_id=1`)
+      .delete(`/api/v1/projects/${projectID}`)
       .set({ authorization: dummyData.nimsumsToken })
 
       const deleted = await db('palettes').where({ project_id: projectID });
@@ -257,11 +277,11 @@ describe('Server', () => {
       const invalideId = -1;
 
 			const response = await request(app)
-      .delete(`/api/v1/projects/${invalideId}?user_id=1`)
+      .delete(`/api/v1/projects/${invalideId}`)
       .set({ authorization: dummyData.nimsumsToken });
 
 			const expectedError = {
-				error: 'Failed to Delete: Project does not exist'
+				error: 'Not a user project or invalid id'
       };
       
 			expect(response.status).toBe(404);
@@ -286,30 +306,25 @@ describe('Server', () => {
 
 		it('should respond with an error if id param is not in the palettes db', async () => {
       const invalidId = -1;
+
 			const response = await request(app)
-      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
+      .delete(`/api/v1/palettes/${invalidId}`)
       .set({ authorization: dummyData.nimsumsToken })
 
 			const expectedError = {
-				error: 'Failed to Delete: Palette does not exist'
+				error: 'Not a user palette or invalid id'
 			};
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(expectedError);
     });
 
-    it('should reject if token/user id is invalid', async () => {
-      const invalidId = -1;
+    it('should reject if token is invalid', async () => {
 			const response = await request(app)
-      .delete(`/api/v1/palettes/${invalidId}?user_id=1`)
-      .set({ authorization: dummyData.nimsumsToken })
+      .delete(`/api/v1/palettes/1`)
+      .set({ authorization: "Not Valid" })
 
-			const expectedError = {
-				error: 'Failed to Delete: Palette does not exist'
-			};
-
-			expect(response.status).toBe(404);
-			expect(response.body).toEqual(expectedError);
+			expect(response.status).toBe(403);
     });
     
 	});
@@ -318,12 +333,12 @@ describe('Server', () => {
 		const newName = { project_name: 'NIMDIMSUM' };
 
 		it('should update the project name on valid requests', async () => {
-			const project = await db('projects').first();
-      const projectToUpdate = project.id;
+			const nimsProject = await db('projects').where({ id: 2 }).first();
+      const projectToUpdate = nimsProject.id;
       
       const response = await request(app)
-        .put(`/api/v1/projects/${projectToUpdate}?user_id=2`)
-        .set({ authorization: dummyData.lynnardsToken })
+        .put(`/api/v1/projects/${projectToUpdate}?`)
+        .set({ authorization: dummyData.nimsumsToken })
         .send(newName)
 
       const updated = await db('projects').where({ id: projectToUpdate }).first();
@@ -334,18 +349,26 @@ describe('Server', () => {
 
 		it('should respond with an error for invalid project id', async () => {
 			const error = {
-				error: 'Failed to update: Project does not exist'
+				error: 'Not a user project or invalid id'
 			};
       const invalidId = -1;
       
       const response = await request(app)
-        .put(`/api/v1/projects/${invalidId}?user_id=2`)
+        .put(`/api/v1/projects/${invalidId}`)
         .set({ authorization: dummyData.lynnardsToken })
         .send(newName)
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .put(`/api/v1/projects/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 
 	describe('PUT /api/v1/palettes/:id', () => {
@@ -360,7 +383,7 @@ describe('Server', () => {
 			const paletteToUpdate = palette.id;
 
 			const response = await request(app)
-        .put(`/api/v1/palettes/${paletteToUpdate}?user_id=1`)
+        .put(`/api/v1/palettes/${paletteToUpdate}`)
         .set({ authorization: dummyData.nimsumsToken })
         .send(updatedPalette)
 
@@ -374,17 +397,25 @@ describe('Server', () => {
 
 		it('should respond with an error for invalid palette id', async () => {
 			const error = {
-				error: 'Failed to update: Palette does not exist'
+				error: 'Not a user palette or invalid id'
       };
       const invalidId = -1;
 
 			const response = await request(app)
-        .put(`/api/v1/palettes/${invalidId}?user_id=1`)
+        .put(`/api/v1/palettes/${invalidId}`)
         .set({ authorization: dummyData.nimsumsToken })
         .send(updatedPalette)
 
 			expect(response.status).toBe(404);
 			expect(response.body).toEqual(error);
-		});
+    });
+    
+    it('should reject if token is invalid', async () => {
+			const response = await request(app)
+      .put(`/api/v1/palettes/1`)
+      .set({ authorization: "Bearer INVALID TOKEN" })
+
+			expect(response.status).toBe(403);
+    });
 	});
 });
