@@ -316,13 +316,13 @@ describe('Server', () => {
 	describe('PUT /api/v1/projects/:id', () => {
 		const newName = { project_name: 'NIMDIMSUM' };
 
-		it('should update the project name on valid requests', async () => {
-			const project = await db('projects').where({ id: 1 });
-      const projectToUpdate = project.id;
+		fit('should update the project name on valid requests', async () => {
+			const nimsProject = await db('projects').where({ id: 2 }).first();
+      const projectToUpdate = nimsProject.id;
       
       const response = await request(app)
         .put(`/api/v1/projects/${projectToUpdate}?`)
-        .set({ authorization: dummyData.lynnardsToken })
+        .set({ authorization: dummyData.nimsumsToken })
         .send(newName)
 
       const updated = await db('projects').where({ id: projectToUpdate }).first();
