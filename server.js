@@ -24,7 +24,7 @@ app.listen(app.get('port'), () => {
 });
 
 app.get('/api/v1/projects', verifyToken, (req, res) => {
-	const { palettes } = req.query;
+  const { palettes } = req.query;
 	if (palettes === 'included') {
 		db
 			.raw(
@@ -38,7 +38,10 @@ app.get('/api/v1/projects', verifyToken, (req, res) => {
 	} else {
 		db('projects')
 			.select()
-			.then(projects => res.status(200).json(projects))
+			.then(projects => {
+        const filtered = projects.filter(proj => proj.user_id === res.auth.user.id)
+        res.status(200).json(filtered)
+      })
 			.catch(error => res.status(500).json({ error }));
 	}
 });
@@ -95,30 +98,22 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 
 app.post('/api/v1/projects', verifyToken, (req, res) => {
 	let { project_name } = req.body;
-	let user_id = parseInt(req.query.user_id);
 
-	if (res.auth.user.id === user_id) {
 		if (!project_name)
 			return res.status(422).send({
 				error: 'Required parameter "project_name" is missing'
 			});
-
 		db('projects')
-			.insert({ project_name, user_id }, 'id')
+			.insert({ project_name, user_id: res.auth.user.id }, 'id')
 			.then(projectId => res.status(201).json(...projectId))
 			.catch(error => res.status(500).json({ error }));
-	} else {
-		res.sendStatus(403);
-	}
 });
 
 app.post('/api/v1/palettes', verifyToken, (req, res) => {
 	let newPalette = req.body;
-	let user_id = parseInt(req.query.user_id);
 
 	const parameters = [ 'palette_name', 'project_id', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5' ];
 
-	if (res.auth.user.id === user_id) {
 		for (let requiredParam of parameters) {
 			if (!newPalette[requiredParam]) {
 				res.status(422).json({
@@ -130,11 +125,8 @@ app.post('/api/v1/palettes', verifyToken, (req, res) => {
 
 		db('palettes')
 			.insert(newPalette, 'id')
-			.then(paletteId => res.status(201).json(paletteId))
+			.then(paletteId => res.status(201).json(...paletteId))
 			.catch(error => res.status(500).json({ error }));
-	} else {
-		res.sendStatus(403);
-	}
 });
 
 app.delete('/api/v1/projects/:id', verifyToken, checkIfUserProject, (req, res) => {
