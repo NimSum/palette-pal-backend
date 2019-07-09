@@ -331,7 +331,7 @@ describe('Server', () => {
 			expect(updated.project_name).toEqual(newName.project_name);
 		});
 
-		fit('should respond with an error for invalid project id', async () => {
+		it('should respond with an error for invalid project id', async () => {
 			const error = {
 				error: 'Not a user project or invalid id'
 			};
@@ -359,7 +359,7 @@ describe('Server', () => {
 			const paletteToUpdate = palette.id;
 
 			const response = await request(app)
-        .put(`/api/v1/palettes/${paletteToUpdate}?user_id=1`)
+        .put(`/api/v1/palettes/${paletteToUpdate}`)
         .set({ authorization: dummyData.nimsumsToken })
         .send(updatedPalette)
 
@@ -373,12 +373,12 @@ describe('Server', () => {
 
 		it('should respond with an error for invalid palette id', async () => {
 			const error = {
-				error: 'Failed to update: Palette does not exist'
+				error: 'Not a user palette or invalid id'
       };
       const invalidId = -1;
 
 			const response = await request(app)
-        .put(`/api/v1/palettes/${invalidId}?user_id=1`)
+        .put(`/api/v1/palettes/${invalidId}`)
         .set({ authorization: dummyData.nimsumsToken })
         .send(updatedPalette)
 
