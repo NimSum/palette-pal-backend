@@ -28,7 +28,6 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  console.log(req.body)
 	const { email, password } = req.body;
 
 	if (validateInputs(req.body)) {
