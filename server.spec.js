@@ -47,11 +47,15 @@ describe('Server', () => {
 	});
 
 	describe('GET /api/v1/projects/:id', () => {
-		it('should return a specific project with the id in the endpoint', async () => {
-			const expectedProject = await db('projects').first();
-			const id = expectedProject.id;
+		fit('should return a specific project with the id in the endpoint', async () => {
+      const expectedProject = await db('projects').where({ id: 1 })
 
-			const response = await request(app).get(`/api/v1/projects/${id}`);
+			const id = expectedProject.id;
+      
+      const response = await request(app)
+      .get(`/api/v1/projects/${id}`)
+      .set({ authorization: dummyData.lynnardsToken })
+
 			const result = response.body;
 
 			expect(result.project_name).toEqual(expectedProject.project_name);
