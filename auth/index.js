@@ -41,7 +41,10 @@ router.post('/login', (req, res) => {
 							expiresIn: '7d'
             };
             const { user_name, email, id } = user;
-						jwt.sign({ user: { id, user_name, email} }, 'SECRETKEYGOESHERE', options, async (err, token) => {
+            const key = process.env.PORT 
+              ? process.env.SECRET_KEY
+              : 'SECRETKEYGOESHERE';
+						jwt.sign({ user: { id, user_name, email} }, key, options, async (err, token) => {
 							if (err) res.sendStatus(500);
 							res.status(200).json({
 								token,

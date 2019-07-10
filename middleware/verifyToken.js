@@ -9,7 +9,10 @@ function verifyToken(req, res, next) {
     const token = bearerHeader.split(' ')[1];
     req.token = token;
     // replace secret key with env var
-    jwt.verify(req.token, 'SECRETKEYGOESHERE', (err, authData) => {
+    const key = process.env.PORT 
+      ? process.env.SECRET_KEY
+      : 'SECRETKEYGOESHERE';
+    jwt.verify(req.token, key, (err, authData) => {
       if (err) {
         res.sendStatus(403)
       } else {
