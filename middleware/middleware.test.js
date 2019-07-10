@@ -48,5 +48,26 @@ describe('Middlewares', () => {
     })
   })
 
- 
+  describe('verifyToken', () => {
+    it('should continue of user token is valid', async () => {
+      const response = await request(app)
+        .get('/api/v1/projects')
+        .set({ authorization: mockData.nimsumsToken })
+      expect(response.status).toBe(200);
+    })
+
+    it('should reject if user token is invalid', async () => {
+      const response = await request(app)
+        .get('/api/v1/projects')
+        .set({ authorization: "Bearer SECRET KEY" })
+      expect(response.status).toBe(403);
+    })
+
+    it('should reject if token format is invalid', async () => {
+      const response = await request(app)
+        .get('/api/v1/projects')
+        .set({ authorization: "Bearer:LKSDJFPOIELKDE:LWKJ" })
+      expect(response.status).toBe(403);
+    })
+  })
 })
