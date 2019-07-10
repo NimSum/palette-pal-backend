@@ -9,6 +9,7 @@ before_script:
 - npm run migrate-test
 - npm run seed-test
 script:
+- npm run test
 - npm run test-auth
 - npm run test-middleware
 notifications:
