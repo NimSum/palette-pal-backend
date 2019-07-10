@@ -1,4 +1,4 @@
-const { getUserData, addDefaultProject } = require('./index');
+const { getUserData, addDefaultProject, getUser } = require('./index');
 const app = require('../server');
 const request = require('supertest');
 const db = require('../db');
@@ -129,6 +129,15 @@ describe('Authorization router', () => {
       const addedProject = await db('projects').where({ project_name: "Uncategorized"}).first()
 
       expect(addedProject.user_id).toEqual(1)
+    })
+  })
+
+  describe('getUser func', () => {
+    it('should get user from users db using email as a param', async () => {
+      const response = await getUser('lynnard@lynne.com');
+
+      expect(response.email).toEqual('lynnard@lynne.com');
+      expect(response.id).toEqual(2);
     })
   })
 
