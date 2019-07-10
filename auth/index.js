@@ -21,7 +21,7 @@ router.post('/signup', (req, res) => {
 			} else {
 				res.status(400).json({ error: 'Email in use' });
 			}
-		});
+		}).catch(err => res.status(500).json(err));
 	} else {
 		res.status(403).json({ error: 'Invalid params, user_name, email, password required' });
 	}

@@ -27,5 +27,33 @@ describe('Authorization router', () => {
       expect(response.status).toBe(201)
       expect(response.body).toEqual(3);
     })
+
+    it('should reject new user request if missing params', async () => {
+      mockSignupData.user_name = "";
+
+      const response = await request(app)
+        .post('/auth/signup')
+        .send(mockSignupData);
+
+      const expectedErr = { error: 'Invalid params, user_name, email, password required' }
+      expect(response.status).toBe(403)
+
+      expect(response.body).toEqual(expectedErr);
+    })
+
+    it('should reject new user request if email is already in use', async () => {
+      mockSignupData.user_name = "lynnard";
+      mockSignupData.email = "lynnard@lynne.com";
+
+      const response = await request(app)
+        .post('/auth/signup')
+        .send(mockSignupData);
+
+      const expectedErr = { error: 'Email in use' }
+      expect(response.status).toBe(400)
+
+      expect(response.body).toEqual(expectedErr);
+    })
+
   })
 })
