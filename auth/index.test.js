@@ -17,12 +17,13 @@ describe('Authorization router', () => {
       "password": "HelloThere"
     }
 
-    it('should create new user with valid params', async () => {
+    it('should create new user with valid params', async (done) => {
       const response = await request(app)
         .post('/auth/signup')
         .send(mockSignupData);
       expect(response.status).toBe(201)
       expect(response.body).toEqual(3);
+      done();
     })
 
     it('should reject new user request if missing params', async () => {
