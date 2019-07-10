@@ -5,7 +5,9 @@
   "main": "knexfile.js",
   "scripts": {
     "start": "node server.js",
-    "test": "jest --forceExit",
+    "test": "jest server --forceExit",
+    "test-middleware": "jest middleware --forceExit",
+    "test-auth": "jest auth --forceExit",
     "test:watch": "jest --watchAll",
     "migrate-test": "knex migrate:latest --env=test",
     "seed-test": "knex seed:run --env=test"

@@ -5,6 +5,8 @@ services:
 - postgresql
 before_script:
 - npm install dotenv
+- npm run test-auth
+- npm run test-middleware
 - psql -c 'CREATE DATABASE palettes_auth_test;' -U postgres
 - npm run migrate-test
 - npm run seed-test
