@@ -56,4 +56,22 @@ describe('Authorization router', () => {
     })
 
   })
+
+  describe('POST /auth/login', () => {
+    const mockValidUser = {
+      "email": "nimsum@nim.com",
+      "password": "nimsum"
+    }
+    it('should login new user with valid credentials', async () => {
+      const response = await request(app)
+        .post('/auth/login')
+        .send(mockValidUser)
+
+      expect(response.status).toEqual(200);
+      expect(typeof response.body.token).toEqual('string');
+      expect(response.body.projects).toHaveLength(1);
+    })
+
+
+  })
 })
