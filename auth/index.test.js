@@ -1,7 +1,8 @@
-const { router } = require('./index');
+const { router, getUserData } = require('./index');
 const app = require('../server');
 const request = require('supertest');
 const db = require('../db');
+const mockData = require('../db/seeds/seeds-data/dummyData.json')
 
 describe('Authorization router', () => {
   const mockSignupData = {
@@ -117,6 +118,13 @@ describe('Authorization router', () => {
       expect(badPassword.status).toBe(403)
       expect(badPassword.body).toEqual(expectedError)
     })
-
   })
+
+  describe('getUserData func', () => {
+    it('should return projects based on the user id param', async () => {
+      const result = await getUserData(1);
+      expect(result).toEqual(mockData.mockProjectWithPalette)
+    })
+  })
+
 })

@@ -68,7 +68,13 @@ function getUserData(userId){
 }
 
 async function addDefaultProject(userId){
-	await db('projects').insert({ project_name: 'Uncategorized', user_id: parseInt(userId) });
+  const defaultProject = { 
+    project_name: 'Uncategorized', 
+    user_id: parseInt(userId) 
+  }
+  
+  await db('projects')
+    .insert(defaultProject);
 }
 
 function validateInputs(user){
