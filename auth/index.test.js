@@ -62,6 +62,7 @@ describe('Authorization router', () => {
       "email": "nimsum@nim.com",
       "password": "nimsum"
     }
+
     it('should login new user with valid credentials', async () => {
       const response = await request(app)
         .post('/auth/login')
@@ -70,6 +71,24 @@ describe('Authorization router', () => {
       expect(response.status).toEqual(200);
       expect(typeof response.body.token).toEqual('string');
       expect(response.body.projects).toHaveLength(1);
+    })
+
+    it('should reject if credentials are invalid', async () => {
+      mockValidUser.email = "invalid@email.com";
+
+      const invalidEmail = await request(app)
+        .post('/auth/login')
+        .send(mockValidUser)
+      expect(invalidEmail.status).toBe(403);
+
+      mockValidUser.email = "nimsum@nim.com";
+      mockValidUser.password = "password";
+
+      const invalidPassword = await request(app)
+        .post('/auth/login')
+        .send(mockValidUser)
+      expect(invalidPassword.status).toBe(403);
+      
     })
 
 
