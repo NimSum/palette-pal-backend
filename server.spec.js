@@ -14,7 +14,7 @@ describe('Server', () => {
 
 	beforeEach(async () => {
 		await db.seed.run();
-	});
+  });
 
 	describe('GET /api/v1/projects', () => {
 		it('should return all projects in the db project table if they exist', async () => {
@@ -295,7 +295,7 @@ describe('Server', () => {
 			const paletteToDelete = palette.id;
 
 			const response = await request(app)
-      .delete(`/api/v1/palettes/${paletteToDelete}?user_id=1`)
+      .delete(`/api/v1/palettes/${paletteToDelete}`)
       .set({ authorization: dummyData.nimsumsToken })
 
 			const deleted = await db('palettes').where({ id: paletteToDelete });
@@ -417,5 +417,5 @@ describe('Server', () => {
 
 			expect(response.status).toBe(403);
     });
-	});
+  });
 });

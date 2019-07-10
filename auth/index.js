@@ -21,7 +21,7 @@ router.post('/signup', (req, res) => {
 			} else {
 				res.status(400).json({ error: 'Email in use' });
 			}
-		});
+		}).catch(err => res.status(500).json(err));
 	} else {
 		res.status(403).json({ error: 'Invalid params, user_name, email, password required' });
 	}
@@ -39,8 +39,12 @@ router.post('/login', (req, res) => {
 					if (result) {
 						let options = {
 							expiresIn: '7d'
-						};
-						jwt.sign({ user }, 'SECRETKEYGOESHERE', options, async (err, token) => {
+            };
+            const { user_name, email, id } = user;
+            const key = process.env.PORT 
+              ? process.env.SECRET_KEY
+              : 'SECRETKEYGOESHERE';
+						jwt.sign({ user: { id, user_name, email} }, key, options, async (err, token) => {
 							if (err) res.sendStatus(500);
 							res.status(200).json({
 								token,
@@ -51,7 +55,7 @@ router.post('/login', (req, res) => {
 					} else res.status(403).json({ error: 'Invalid login' });
 				});
 			}
-		});
+		}).catch(err => res.status(500).json(err));
 	} else {
 		res.status(403).json({ error: 'Invalid login' });
 	}
@@ -68,7 +72,10 @@ function getUserData(userId){
 }
 
 async function addDefaultProject(userId){
-	await db('projects').insert({ project_name: 'Uncategorized', user_id: parseInt(userId) });
+  await db('projects').insert({ 
+    project_name: 'Uncategorized', 
+    user_id: parseInt(userId) 
+  });
 }
 
 function validateInputs(user){
@@ -83,4 +90,4 @@ function getUser(email){
 	return db('users').where({ email }).first();
 }
 
-module.exports = { router };
+module.exports = { router, getUserData, getUser, addDefaultProject };
