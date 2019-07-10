@@ -140,7 +140,7 @@ app.delete('/api/v1/projects/:id', verifyToken, checkIfUserProject, (req, res) =
 				res.status(404).json({
 					error: 'Failed to Delete: Project does not exist'
 				});
-			} else res.sendStatus(202);
+      } else res.sendStatus(202).json('Project successfully deleted');
 		})
 		.catch(error => res.status(500).json({ error }));
 });
@@ -156,7 +156,7 @@ app.delete('/api/v1/palettes/:id', verifyToken, checkIfUserPalette, (req, res) =
 				res.status(404).json({
 					error: 'Failed to Delete: Palette does not exist'
 				});
-			} else res.sendStatus(202);
+      } else res.sendStatus(202).json('Palette successfully updated');
 		})
 		.catch(error => res.status(500).json({ error }));
 });
@@ -173,7 +173,7 @@ app.put('/api/v1/projects/:id', verifyToken, checkIfUserProject, (req, res) => {
 				res.status(404).json({
 					error: 'Failed to update: Project does not exist'
 				});
-			} else res.sendStatus(202);
+			} else res.sendStatus(202).json('Project successfully updated');
 		})
 		.catch(error => res.status(500).json({ error }));
 });
@@ -187,7 +187,7 @@ app.put('/api/v1/palettes/:id', verifyToken, checkIfUserPalette, (req, res) => {
 			res.status(404).json({
 				error: 'Failed to update: Palette does not exist'
 			});
-		} else res.sendStatus(202);
+    } else res.sendStatus(202).json('Palette successfully updated');
 	});
 });
 
