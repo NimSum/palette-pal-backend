@@ -95,8 +95,8 @@ describe('Authorization router', () => {
       expect(invalidPassword.body).toEqual(expectedError)
     })
 
-    it('should reject if email or password does not meet required criterias', async () => {
-      mockValidUser.email = "";
+    it('should reject if email does not meet required criterias', async () => {
+      mockValidUser.email = null;
 
       const invalidInputs = await request(app)
         .post('/auth/login')
@@ -106,6 +106,17 @@ describe('Authorization router', () => {
       expect(invalidInputs.body).toEqual(expectedError)
     })
 
+    it('should reject if password does not meet required criterias', async () => {
+      mockValidUser.email = "nimsum@nim.com";
+      mockValidUser.password = [];
+
+      const badPassword = await request(app)
+        .post('/auth/login')
+        .send(mockValidUser)
+
+      expect(badPassword.status).toBe(403)
+      expect(badPassword.body).toEqual(expectedError)
+    })
 
   })
 })
