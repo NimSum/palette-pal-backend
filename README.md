@@ -71,7 +71,7 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   // The server responds with an invalid params message if the necessary data isn't provided
   ```
   {
-  	error: 'Invalid params, user_name, email, password required'
+    error: 'Invalid params, user_name, email, password required'
   }
   ```
   
@@ -112,7 +112,7 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   // The server responds with an invalid login message if the username or password isn't in a valid format
   ```
   {
-   error: 'Invalid login'
+    error: 'Invalid login'
   }
   ```
 
@@ -156,7 +156,7 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   // The server responds with an error message if there isn't a valid token
   ```
   {
-   error: 'Forbidden'
+    error: 'Forbidden'
   }
   ```
   
@@ -262,12 +262,13 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
 ```
 
 - EXAMPLE SAD RESPONSE: 
-  // The server responds with an error message if there's no project with that ID or the current user doesn't have access
-  ```
-  {
-   	error: 'Requested id does not correspond to any palettes'
-  }
-  ```
+  
+// The server responds with an error message if there's no project with that ID or the current user doesn't have access
+```
+{
+error: 'Requested id does not correspond to any palettes'
+}
+```
   
 ### Post a Project
    #### Path: `/api/v1/projects`
@@ -296,7 +297,7 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   // The server responds with an error if the project name is missing
   ```
 {
-	error: 'Required parameter "project_name" is missing'
+  error: 'Required parameter "project_name" is missing'
 }
   ```
   
@@ -328,9 +329,123 @@ Then, go to `http://localhost:3005/` in your browser to see the code running in 
   // The server responds with an error if any required fields for new palettes are missing
  ```
 {
-	error: `Expected parameters of: 'palette_name', 'project_id', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5'. Missing: project_id`
+  error: `Expected parameters of: 'palette_name', 'project_id', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5'. Missing: project_id`
 }
  ```
+ 
+ ### Put a Project
+   #### Path: `/api/v1/projects/:id`
+
+  ##### Required Headers:
+  | Type         | value     | Description                             |
+  | ------------ |-----------| ------------                            |  
+  | `Method`      | `PUT`| The put method |
+  | `Authorization`      | `Bearer <user token>`| Your users token |
+  | `Content-Type`   | `application/json`| The communicated data type |
+  
+
+   - EXAMPLE HAPPY RESPONSE:
+   
+   // The server responds with a confirmation message that the project was updated
+   ```
+{
+  'Project successfully updated'
+}
+  ```
+
+  - EXAMPLE SAD RESPONSE:
+  
+  // The server responds with an error if a project with the provided id is not found
+  ```
+{
+  error: 'Failed to update: Project does not exist'
+}
+  ```
+  
+  ### Put a Palette
+   #### Path: `/api/v1/palettes`
+
+  ##### Required Headers:
+  | Type         | value     | Description                             |
+  | ------------ |-----------| ------------                            |  
+  | `Method`      | `PUT`| The put method |
+  | `Authorization`      | `Bearer <user token>`| Your users token |
+  | `Content-Type`   | `application/json`| The communicated data type |
+
+   - EXAMPLE HAPPY RESPONSE:
+   
+   // The server responds with a confirmation message that the palette was updated
+   ```
+{
+  'Palette successfully updated'
+}
+  ```
+
+  - EXAMPLE SAD RESPONSE:
+  
+  // The server responds with an error if a palette with the provided id is not found
+  ```
+{
+  error: 'Failed to update: Palette does not exist'
+}
+  ```
+  
+  ### Delete a Project
+   #### Path: `/api/v1/projects/:id`
+
+  ##### Required Headers:
+  | Type         | value     | Description                             |
+  | ------------ |-----------| ------------                            |  
+  | `Method`      | `DELETE`| The delete method |
+  | `Authorization`      | `Bearer <user token>`| Your users token |
+  | `Content-Type`   | `application/json`| The communicated data type |
+  
+
+   - EXAMPLE HAPPY RESPONSE:
+   
+   // The server responds with a confirmation message that the project was updated
+   ```
+{
+  'Project successfully deleted'
+}
+  ```
+
+  - EXAMPLE SAD RESPONSE:
+  
+  // The server responds with an error if a project with the provided id is not found
+  ```
+{
+  error: 'Failed to Delete: Project does not exist'
+}
+  ```
+  
+  ### Delete a Palette
+   #### Path: `/api/v1/palettes`
+
+  ##### Required Headers:
+  | Type         | value     | Description                             |
+  | ------------ |-----------| ------------                            |  
+  | `Method`      | `DELETE`| The delete method |
+  | `Authorization`      | `Bearer <user token>`| Your users token |
+  | `Content-Type`   | `application/json`| The communicated data type |
+
+   - EXAMPLE HAPPY RESPONSE:
+   
+   // The server responds with a confirmation message that the palette was updated
+   ```
+{
+  'Palette successfully deleted'
+}
+  ```
+
+  - EXAMPLE SAD RESPONSE:
+  
+  // The server responds with an error if a palette with the provided id is not found
+  ```
+{
+  error: 'Failed to Delete: Palette does not exist'
+}
+  ```
   
 
 ## Future Plans
