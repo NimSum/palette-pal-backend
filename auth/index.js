@@ -83,4 +83,4 @@ function getUser(email){
 	return db('users').where({ email }).first();
 }
 
-module.exports = { router };
+module.exports = { router, getUserData, getUser };
