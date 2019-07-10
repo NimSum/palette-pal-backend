@@ -62,6 +62,7 @@ describe('Authorization router', () => {
       "email": "nimsum@nim.com",
       "password": "nimsum"
     }
+    const expectedError = {"error": "Invalid login"};
 
     it('should login new user with valid credentials', async () => {
       const response = await request(app)
@@ -73,14 +74,17 @@ describe('Authorization router', () => {
       expect(response.body.projects).toHaveLength(1);
     })
 
-    it('should reject if credentials are invalid', async () => {
+    it('should reject if user email is invalid', async () => {
       mockValidUser.email = "invalid@email.com";
 
       const invalidEmail = await request(app)
         .post('/auth/login')
         .send(mockValidUser)
       expect(invalidEmail.status).toBe(403);
+      expect(invalidEmail.body).toEqual(expectedError)
+    })
 
+    it('should reject if user password is invalid', async () => {
       mockValidUser.email = "nimsum@nim.com";
       mockValidUser.password = "password";
 
@@ -88,7 +92,18 @@ describe('Authorization router', () => {
         .post('/auth/login')
         .send(mockValidUser)
       expect(invalidPassword.status).toBe(403);
-      
+      expect(invalidPassword.body).toEqual(expectedError)
+    })
+
+    it('should reject if email or password does not meet required criterias', async () => {
+      mockValidUser.email = "";
+
+      const invalidInputs = await request(app)
+        .post('/auth/login')
+        .send(mockValidUser)
+
+      expect(invalidInputs.status).toBe(403)
+      expect(invalidInputs.body).toEqual(expectedError)
     })
 
 
