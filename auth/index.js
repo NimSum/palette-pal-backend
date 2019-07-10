@@ -68,13 +68,10 @@ function getUserData(userId){
 }
 
 async function addDefaultProject(userId){
-  const defaultProject = { 
+  await db('projects').insert({ 
     project_name: 'Uncategorized', 
     user_id: parseInt(userId) 
-  }
-  
-  await db('projects')
-    .insert(defaultProject);
+  });
 }
 
 function validateInputs(user){
@@ -89,4 +86,4 @@ function getUser(email){
 	return db('users').where({ email }).first();
 }
 
-module.exports = { router, getUserData, getUser };
+module.exports = { router, getUserData, getUser, addDefaultProject };

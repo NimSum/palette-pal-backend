@@ -1,25 +1,21 @@
-const { router, getUserData } = require('./index');
+const { getUserData, addDefaultProject } = require('./index');
 const app = require('../server');
 const request = require('supertest');
 const db = require('../db');
 const mockData = require('../db/seeds/seeds-data/dummyData.json')
 
 describe('Authorization router', () => {
-  const mockSignupData = {
-    "user_name": "obi",
-    "email": "one@kenobi.com",
-    "password": "HelloThere"
-  }
-  const mockLogin = {
-    "user_name": "obi",
-    "password": "HelloThere"
-  }
 
   beforeEach(async () => {
 		await db.seed.run();
   });
   
   describe('POST /auth/signup', () => {
+    const mockSignupData = {
+      "user_name": "obi",
+      "email": "one@kenobi.com",
+      "password": "HelloThere"
+    }
 
     it('should create new user with valid params', async () => {
       const response = await request(app)
@@ -124,6 +120,15 @@ describe('Authorization router', () => {
     it('should return projects based on the user id param', async () => {
       const result = await getUserData(1);
       expect(result).toEqual(mockData.mockProjectWithPalette)
+    })
+  })
+
+  describe('addDefaultProject func', () => {
+    it('should add a default project to projects db', async () => {
+      await addDefaultProject(1);
+      const addedProject = await db('projects').where({ project_name: "Uncategorized"}).first()
+
+      expect(addedProject.user_id).toEqual(1)
     })
   })
 
