@@ -39,8 +39,9 @@ router.post('/login', (req, res) => {
 					if (result) {
 						let options = {
 							expiresIn: '7d'
-						};
-						jwt.sign({ user }, 'SECRETKEYGOESHERE', options, async (err, token) => {
+            };
+            const { user_name, email, id } = user;
+						jwt.sign({ user: { id, user_name, email} }, 'SECRETKEYGOESHERE', options, async (err, token) => {
 							if (err) res.sendStatus(500);
 							res.status(200).json({
 								token,
