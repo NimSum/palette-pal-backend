@@ -191,4 +191,20 @@ app.put('/api/v1/palettes/:id', verifyToken, checkIfUserPalette, (req, res) => {
 	});
 });
 
+app.patch('/api/v1/palettes/:id', verifyToken, async (req, res) => {
+	const { id } = req.params;
+  const palette = await db('palettes').where({ id }).select('user_save_count').first();
+  if (palette) {
+    db('palettes').where({ id }).update({ 
+      user_save_count: palette.user_save_count + 1,
+      updated_at: db.fn.now() ,
+      }, [ 'id' ])
+      .then(id => res.sendStatus(202));
+  } else {
+    res.status(404).json({
+      error: 'Failed to update: Palette does not exist'
+    });
+  };
+});
+
 module.exports = app;
