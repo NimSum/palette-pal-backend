@@ -1,6 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.table('palettes', table => {
-    table.integer('user_save_count');
+    table.integer('user_save_count').defaultTo(0);
   });
 };
 
